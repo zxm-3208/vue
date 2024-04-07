@@ -93,7 +93,7 @@
 				this.$router.push('/edit')
 			},
 			loginout(){
-				axios.get('http://localhost:8081/logout', {
+				axios.get('http://localhost:8020/douyin_auth/logout', {
 					headers: {
 						'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 					}
@@ -107,7 +107,7 @@
                 });
 			},
 			hello(){
-				axios.get('http://localhost:8081/user/hello', {
+				axios.get('http://localhost:8020/douyin_auth/user/hello', {
 					headers: {
 						'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 					}

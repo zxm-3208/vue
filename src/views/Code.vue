@@ -60,17 +60,17 @@
 					// this.loading=false;
 				}	
 			},
-			clickFun(){
+			async clickFun(){
 				// 登录请求处理
-				axios.post('http://localhost:8081/user/login',{
-					"phone": this.$route.query.phone,
-					"code": this.code
-				})
-                .then((res)=>{
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_auth/user/login',{
+						"phone": this.$route.query.phone,
+						"code": this.code
+					})
+					console.info(res)
 					if(res.data.code=="200"){
 						// 登录成功，将Token存储在内存中
 						localStorage.setItem('authorization',"Bearer "+res.data.data.authorization)
-						
 						// 跳转到首页或其他需要登录的页面
 						this.$router.push({ path:"/me"})
 					}
@@ -78,10 +78,9 @@
 						this.$toast('验证码错误！')
 
 					}
-				})
-                .catch(error => {
-                    console.error(error);
-                });
+				}catch(err){
+					console.error(err);
+				}
 			},
 			// 60秒 倒计时
 			timer(){

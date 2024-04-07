@@ -101,7 +101,7 @@
 				}
 			},
 			getCodeImg () {
-				axios.get('http://localhost:8081/user/captchaImage',{
+				axios.get('http://localhost:8020/douyin_auth/user/captchaImage',{
 					params: {
 						uuid: this.uuid
 					}
@@ -118,7 +118,7 @@
 			},
 			loginAction(){
 				// 请求登录接口
-				axios.post('http://localhost:8081/user/logoinbyusername',{
+				axios.post('http://localhost:8020/douyin_auth/user/logoinbyusername',{
 					"userName": this.username,
 					"password": this.password,
 					"code": this.code,
