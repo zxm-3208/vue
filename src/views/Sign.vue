@@ -85,14 +85,26 @@
             }
         },
         methods: {
-            getCode() {
-                axios.get('http://localhost:8020/douyin_auth/user/code?phone='+this.phone)
-                .then(
-                    this.$router.push("/code?phone="+this.phone),
-                )
-                .catch(error => {
-                    console.error(error);
-                });
+            async getCode() {
+                try{
+                    let res = await axios.get('http://localhost:8020/douyin_auth/user/code?phone='+this.phone)
+                    if(res.data.code==200){
+                        this.$router.push("/code?phone="+this.phone)
+                    }
+                    else{
+                        this.$toast('请稍后再试！')
+                    }
+                }
+                catch(err){
+					console.error(err);
+				}
+                // axios.get('http://localhost:8020/douyin_auth/user/code?phone='+this.phone)
+                // .then(
+                //     this.$router.push("/code?phone="+this.phone),
+                // )
+                // .catch(error => {
+                //     console.error(error);
+                // });
                 // this.$router.push("/user/code?"+this.phone) //去密码登陆页面
             },
             show() {

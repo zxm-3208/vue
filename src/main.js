@@ -21,6 +21,9 @@ import Toast from './components/toast/toast.js'
 // 将组件注册到vue的原型链,这样就可以在所有的VUE的实例里面使用this.$toast()
 Vue.prototype.$toast=Toast   //注册全局组件
 
+import uploader from 'vue-simple-uploader'
+Vue.use(uploader)
+
 import Axios from 'axios'
 Vue.prototype.$http = Axios
 Axios.defaults.baseURL = 'http://localhost:8080/'

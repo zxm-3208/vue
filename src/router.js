@@ -36,6 +36,11 @@ const router=new Router({
 					]
 				},
 				{
+					path:'/publist',
+					name:'publist',
+					component:()=>import('./views/publist/Publist.vue')
+				},
+				{
 					path:'/follow',
 					name:'follow',
 					component:()=>import('./views/follow/Follow.vue')

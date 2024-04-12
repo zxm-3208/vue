@@ -138,7 +138,7 @@
 						this.$router.push({ path:"/me"})
 					}
 					else{
-						this.$toast('验证码错误！')
+						this.$toast('登录失败！')
 
 					}
 				})
