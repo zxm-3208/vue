@@ -77,26 +77,27 @@ export default {
     async uploadFileCheck(fileMd5, chunks, fileName) {
       // 根据文件的hash值进行上传之前的校验，校验结果如下三种情况
       const res = await checkFileFn(fileMd5);
+      console.info(res)
       // 等于1曾经上传过，不需要再上传了
-      if (res.data.resultCode == 1) {
+      if (res.data.data == "1") {
         this.$message({
           type: "warning",
-          message: fileStatus[res.data.resultCode],
+          message: fileStatus[res.data.data],
         });
         return; // 拦截停下
       }
       // 等于2表示曾经上传过一部分，现在要继续上传
-      if (res.data.resultCode == 2) {
+      if (res.data.data == "2") {
         // 若是文件曾上传过一部分，后端会返回上传过得部分的文件索引，前端通过索引可以知道哪些
         // 上传过，做一个过滤，已上传的文件就不用继续上传了，上传未上传过的文件片
         this.doneFileList = res.data.resultData.map((item) => {
           return item * 1; // 后端给到的是字符串索引，这里转成数字索引
         });
-        console.log(fileStatus[res.data.resultCode]);
+        console.log(fileStatus[res.data.data]);
       }
       // 等于0表示没有上传过，直接上传
-      if (res.data.resultCode == 0) {
-        console.log(fileStatus[res.data.resultCode]);
+      if (res.data.data == "0") {
+        console.log(fileStatus[res.data.data]);
       }
 
       let formDataList = []; // 准备参数数组
@@ -131,7 +132,6 @@ export default {
             return { formData };
           });
       }
-      console.info("xxxxxxxxxxxxxx");
       this.fileUpload(formDataList, fileName);
     },
     /**
@@ -152,7 +152,7 @@ export default {
         this.fileProgress = 100;
         // 最后再告知后端合并一下已经上传的文件碎片了即可
         const res = await tellBackendMergeFn(fileName, this.fileHash);
-        if (res.data.resultCode === 0) {
+        if (res.data.data === 0) {
           console.log("文件并合成功");
         }
       });

@@ -48,12 +48,13 @@ export function calFileMd5Fn(chunks, progressCallbackFn) {
  * 发请求，校验文件是否上传过，分三种情况：见：fileStatus
  * */
 export function checkFileFn(fileMd5) {
+    const data= {'fileMd5': fileMd5};
     return new Promise((resolve, reject) => {
-        resolve(axios.post('http://localhost:8020/douyin_publish/publish/upload',{headers: {
+        resolve(axios.post('http://localhost:8020/douyin_publish/publish/checkBigFile', data, {headers: {
             'Content-Type': 'application/json',
             'authorization': localStorage.getItem('authorization')
-          }}))
-        // resolve(axios.post(`localhost:8040/douyin_publish/publish/upload?fileMd5=${fileMd5}`))
+          }}
+          ))
     })
 }
 
@@ -61,9 +62,14 @@ export function checkFileFn(fileMd5) {
  * 分片上传请求接口
  * */
 export function sliceFileUploadFn(formData) {
+    // const data= {'fileData': formData};
     return new Promise((resolve, reject) => {
-        resolve(axios.post('http://localhost:8020/douyin_publish/publish/upload'))
-        // resolve(axios.post("localhost:8040/douyin_publish/publish/upload", formData))
+        // resolve(axios.post('http://localhost:8020/douyin_publish/publish/upload'))
+        resolve(axios.post('http://localhost:8020/douyin_publish/publish/upload',formData,{headers: {
+            // 'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
+            'authorization': localStorage.getItem('authorization')
+          }}))
     })
 }
 
@@ -72,6 +78,11 @@ export function sliceFileUploadFn(formData) {
  * */
 export function tellBackendMergeFn(fileName, fileMd5) {
     return new Promise((resolve, reject) => {
-        resolve(axios.post(`localhost:8040/douyin_publish/publish/upload?fileName=${fileName}&fileMd5=${fileMd5}`))
+        console.info("tellBackendMergeFn");
+        // resolve(axios.post(`localhost:8040/douyin_publish/publish/upload?fileName=${fileName}&fileMd5=${fileMd5}`))
+        resolve(axios.post('http://localhost:8020/douyin_publish/publish/uploadFile',{headers: {
+            'Content-Type': 'application/json',
+            'authorization': localStorage.getItem('authorization')
+          }}))
     })
 }
