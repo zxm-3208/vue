@@ -50,6 +50,7 @@ export default {
       chunksCount: 0, // 一共分了多少片
       fileHash: "", // 大文件的hash值
       doneFileList: [], // 部分已完成的
+      undoneFileList: [], // 部分未完成的
       fileProgress: 0, // 上传文件的进度
     };
   },
@@ -77,27 +78,42 @@ export default {
     async uploadFileCheck(fileMd5, chunks, fileName) {
       // 根据文件的hash值进行上传之前的校验，校验结果如下三种情况
       const res = await checkFileFn(fileMd5);
-      console.info(res)
+      console.info(res);
       // 等于1曾经上传过，不需要再上传了
-      if (res.data.data == "1") {
+      if (res.data.code == 1) {
         this.$message({
           type: "warning",
-          message: fileStatus[res.data.data],
+          message: fileStatus[res.data.code],
         });
+        this.fileProgress = 100;
         return; // 拦截停下
       }
       // 等于2表示曾经上传过一部分，现在要继续上传
-      if (res.data.data == "2") {
+      if (res.data.code == 2) {
         // 若是文件曾上传过一部分，后端会返回上传过得部分的文件索引，前端通过索引可以知道哪些
         // 上传过，做一个过滤，已上传的文件就不用继续上传了，上传未上传过的文件片
-        this.doneFileList = res.data.resultData.map((item) => {
-          return item * 1; // 后端给到的是字符串索引，这里转成数字索引
-        });
-        console.log(fileStatus[res.data.data]);
+        for(let i=0;i<res.data.data.length;i++){
+          this.doneFileList.push(res.data.data[i]);
+        }
+        for(let i=0;i<this.chunksCount;i++){
+          if(!this.doneFileList.includes(i)){
+            this.undoneFileList.push(i);
+          }
+        }
+        // 这种回访会产生__ob__ : Observer
+        // this.doneFileList.push(res.data.data
+        // .map((item) => {
+        //   return JSON.parse(item); // 后端给到的是字符串索引，这里转成数字索引
+        // })
+        // );
+        // this.doneFileList = res.data.chunkIndex.map((item) => {
+        //   return item * 1; // 后端给到的是字符串索引，这里转成数字索引
+        // });
+        console.log(fileStatus[res.data.code]);
       }
       // 等于0表示没有上传过，直接上传
-      if (res.data.data == "0") {
-        console.log(fileStatus[res.data.data]);
+      if (res.data.code == 0) {
+        console.log(fileStatus[res.data.code]);
       }
 
       let formDataList = []; // 准备参数数组
@@ -118,15 +134,18 @@ export default {
       }
       // 说明曾经上传过，需要过滤一下，曾经上传过的就不用再上传了
       else {
+        console.info(this.doneFileList.includes(0));
+        console.info(this.doneFileList.includes(1));
         formDataList = chunks
-          .filter((index) => {
+          .filter((item, index) => {
             return !this.doneFileList.includes(index);
+            // return !this.doneFileList[index].includes(index);
           })
           .map((item, index) => {
             let formData = new FormData();
             formData.append("file", item); // 使用FormData可以将blob文件转成二进制binary
             formData.append("chunks", chunks.length);
-            formData.append("chunk", index);
+            formData.append("chunk", this.undoneFileList[index]);
             formData.append("name", fileName);
             formData.append("md5", fileMd5);
             return { formData };
@@ -138,6 +157,8 @@ export default {
      * 第三步，上传文件（分片上传，一片文件就是一个请求）
      * */
     async fileUpload(formDataList, fileName) {
+      const res_num = 0;
+      console.info("formDataList", formDataList);
       const requestListFn = formDataList.map(async ({ formData }, index) => {
         const res = await sliceFileUploadFn(formData);
         // 每上传完毕一片文件，后端告知已上传了多少片，除以总片数，就是进度
@@ -146,15 +167,16 @@ export default {
         );
         return res;
       });
+      console.info("=====",requestListFn);
       // 使用allSettled发请求好一些，挂了的就挂了，不影响后续不挂的请求
       Promise.allSettled(requestListFn).then(async (many) => {
         // 都上传完毕了，文件上传进度条就为100%了
         this.fileProgress = 100;
         // 最后再告知后端合并一下已经上传的文件碎片了即可
-        const res = await tellBackendMergeFn(fileName, this.fileHash);
-        if (res.data.data === 0) {
-          console.log("文件并合成功");
-        }
+        // const res = await tellBackendMergeFn(fileName, this.fileHash);
+        // if (res.data.data === 0) {
+        //   console.log("文件并合成功");
+        // }
       });
     },
   },

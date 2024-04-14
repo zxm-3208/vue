@@ -77,12 +77,12 @@ export function sliceFileUploadFn(formData) {
  * 告知后端要去合并前端上传的文件了
  * */
 export function tellBackendMergeFn(fileName, fileMd5) {
-    return new Promise((resolve, reject) => {
-        console.info("tellBackendMergeFn");
-        // resolve(axios.post(`localhost:8040/douyin_publish/publish/upload?fileName=${fileName}&fileMd5=${fileMd5}`))
-        resolve(axios.post('http://localhost:8020/douyin_publish/publish/uploadFile',{headers: {
-            'Content-Type': 'application/json',
-            'authorization': localStorage.getItem('authorization')
-          }}))
-    })
+    // return new Promise((resolve, reject) => {
+    //     console.info("tellBackendMergeFn");
+    //     // resolve(axios.post(`localhost:8040/douyin_publish/publish/upload?fileName=${fileName}&fileMd5=${fileMd5}`))
+    //     resolve(axios.post('http://localhost:8020/douyin_publish/publish/uploadFile',{headers: {
+    //         'Content-Type': 'application/json',
+    //         'authorization': localStorage.getItem('authorization')
+    //       }}))
+    // })
 }
