@@ -64,7 +64,23 @@ export function checkFileFn(fileMd5) {
 export function sliceFileUploadFn(formData) {
     // const data= {'fileData': formData};
     return new Promise((resolve, reject) => {
-        // resolve(axios.post('http://localhost:8020/douyin_publish/publish/upload'))
+        resolve(axios.post('http://localhost:8020/douyin_publish/publish/uploadchunk',formData,{headers: {
+            // 'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
+            'authorization': localStorage.getItem('authorization')
+          }})
+        .catch(error => {
+            console.error(error);
+        }))
+    })
+}
+
+/*
+* 上传普通文件
+* */
+export function uploadNormalFile(formData) {
+    // const data= {'fileData': formData};
+    return new Promise((resolve, reject) => {
         resolve(axios.post('http://localhost:8020/douyin_publish/publish/upload',formData,{headers: {
             // 'Content-Type': 'application/json',
             'Content-Type': 'multipart/form-data',
@@ -76,13 +92,13 @@ export function sliceFileUploadFn(formData) {
 /**
  * 告知后端要去合并前端上传的文件了
  * */
-export function tellBackendMergeFn(fileName, fileMd5) {
-    // return new Promise((resolve, reject) => {
-    //     console.info("tellBackendMergeFn");
-    //     // resolve(axios.post(`localhost:8040/douyin_publish/publish/upload?fileName=${fileName}&fileMd5=${fileMd5}`))
-    //     resolve(axios.post('http://localhost:8020/douyin_publish/publish/uploadFile',{headers: {
-    //         'Content-Type': 'application/json',
-    //         'authorization': localStorage.getItem('authorization')
-    //       }}))
-    // })
+export function tellBackendMergeFn(fileName, fileMd5, chunkTotal) {
+    const data= {fileMd5: fileMd5, fileName: fileName, chunkTotal:chunkTotal };
+    console.info(data);
+    return new Promise((resolve, reject) => {
+        resolve(axios.post('http://localhost:8020/douyin_publish/publish/mergechunks', data,{headers: {
+            'Content-Type': 'application/json',
+            'authorization': localStorage.getItem('authorization')
+          }}))
+    })
 }

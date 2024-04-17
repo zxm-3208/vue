@@ -38,14 +38,23 @@ Axios.interceptors.request.use(function (config) {
   return Promise.reject(error)
 })
 
-Axios.interceptors.response.use(res=>{
-  if(res.data.code=== 401){
-      if(window.location.href!='http://localhost:8080/#/tbsign'){
-        router.replace('/sign');
-        localStorage.removeItem('authorization')
-      }
+
+// 添加响应拦截器
+Axios.interceptors.response.use(function (res) { // 当状态码为2xx/3xx开头的进这里
+  if(res.data.code=== 401||res.status===401){
+    if(window.location.href!='http://localhost:8080/#/tbsign'){
+      router.replace('/sign');
+      localStorage.removeItem('authorization')
     }
+  }
   return res
+}, async function (error) { // 响应状态码4xx/5xx进这里
+  // 对响应错误做点什么
+ if (error.response.status === 401) { // 身份过期/token无效
+  router.replace('/sign');
+  localStorage.removeItem('authorization');
+  return Promise.reject(error);
+  }
 })
 
 

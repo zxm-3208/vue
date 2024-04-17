@@ -33,6 +33,7 @@ import {
   calFileMd5Fn,
   checkFileFn,
   sliceFileUploadFn,
+  uploadNormalFile,
   tellBackendMergeFn,
 } from "./index.js";
 // 定义文件上传状态码
@@ -134,8 +135,6 @@ export default {
       }
       // 说明曾经上传过，需要过滤一下，曾经上传过的就不用再上传了
       else {
-        console.info(this.doneFileList.includes(0));
-        console.info(this.doneFileList.includes(1));
         formDataList = chunks
           .filter((item, index) => {
             return !this.doneFileList.includes(index);
@@ -160,7 +159,9 @@ export default {
       const res_num = 0;
       console.info("formDataList", formDataList);
       const requestListFn = formDataList.map(async ({ formData }, index) => {
+        console.info("===111===",index);
         const res = await sliceFileUploadFn(formData);
+        console.info("===111===",res);
         // 每上传完毕一片文件，后端告知已上传了多少片，除以总片数，就是进度
         this.fileProgress = Math.ceil(
           (res.data.resultData / this.chunksCount) * 100
@@ -173,10 +174,10 @@ export default {
         // 都上传完毕了，文件上传进度条就为100%了
         this.fileProgress = 100;
         // 最后再告知后端合并一下已经上传的文件碎片了即可
-        // const res = await tellBackendMergeFn(fileName, this.fileHash);
-        // if (res.data.data === 0) {
-        //   console.log("文件并合成功");
-        // }
+        const res = await tellBackendMergeFn(fileName, this.fileHash, this.chunksCount);
+        if (res.data.resultCode === 200) {
+          console.log("文件并合成功");
+        }
       });
     },
   },
