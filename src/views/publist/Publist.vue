@@ -1,25 +1,25 @@
 <template>
   <div id="app">
     <br />
-    <input ref="inputRef" class="inputFile" type="file" @change="changeFile" />
-    <br />
-    <br />
-    <div>大文件分了{{ chunksCount }}片:</div>
-    <br />
-    <div class="pieceItem" v-for="index in chunksCount" :key="index">
-      {{ index - 1 }}
-    </div>
-    <br />
-    <br />
+    <div class="videos">
+		<video-player id="vedioPlayer" class="video-player vjs-default-skin vjs-big-play-centered" ref="videoPlayer" :playsinline="true"
+			:options="playerOptions">
+		</video-player>
+	</div>
+    <div>
     <div>计算此大文件的hash值进度</div>
-    <div class="r">结果为: {{ fileHash }}</div>
     <progress max="100" :value="hashProgress"></progress> {{ hashProgress }}%
-    <br />
-    <br />
+    </div>
     <div>
       <div>上传文件的进度</div>
-      <div class="r" v-show="fileProgress == 100">上传成功</div>
       <progress max="100" :value="fileProgress"></progress> {{ fileProgress }}%
+    </div>
+    <div>
+      
+    </div>
+    <div>
+    <input ref="inputRef" class="inputFile" type="file" @change="changeFile"/>
+    <el-button>xxxx</el-button>
     </div>
     <br />
     <br />
@@ -35,7 +35,11 @@ import {
   sliceFileUploadFn,
   uploadNormalFile,
   tellBackendMergeFn,
+  previewingVideo,
 } from "./index.js";
+import {
+  videoPlayer
+} from 'vue-video-player';
 // 定义文件上传状态码
 const fileStatus = {
   0: "文件不存在（没有上传过）",
@@ -53,7 +57,29 @@ export default {
       doneFileList: [], // 部分已完成的
       undoneFileList: [], // 部分未完成的
       fileProgress: 0, // 上传文件的进度
+
+      // 播放页面
+      playerOptions: {
+        autoplay: false, //如果true,浏览器准备好时开始回放。
+        muted: false, // 默认情况下将会消除任何音频。
+        loop: false, // 导致视频一结束就重新开始。
+        preload: 'auto',
+        fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+        sources: [{
+          src: null, // 路径
+          type: 'video/mp4' // 类型
+        }, ],
+        width: document.documentElement.clientWidth,
+        notSupportedMessage: '上传完毕后，可预览媒体文件', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+        controlBar: false,
+      },
+      playing: true,
+      nextShow: false,
     };
+  },
+  created() {
+    // 在页面加载时调用autoPlayAction()方法自动播放
+    this.autoPlayAction();
   },
   methods: {
     // hash进度条
@@ -81,7 +107,7 @@ export default {
       const res = await checkFileFn(fileMd5);
       console.info(res);
       // 等于1曾经上传过，不需要再上传了
-      if (res.data.code == 1) {
+      if (res.data.code === 1) {
         this.$message({
           type: "warning",
           message: fileStatus[res.data.code],
@@ -90,7 +116,7 @@ export default {
         return; // 拦截停下
       }
       // 等于2表示曾经上传过一部分，现在要继续上传
-      if (res.data.code == 2) {
+      if (res.data.code === 2) {
         // 若是文件曾上传过一部分，后端会返回上传过得部分的文件索引，前端通过索引可以知道哪些
         // 上传过，做一个过滤，已上传的文件就不用继续上传了，上传未上传过的文件片
         for(let i=0;i<res.data.data.length;i++){
@@ -113,14 +139,14 @@ export default {
         console.log(fileStatus[res.data.code]);
       }
       // 等于0表示没有上传过，直接上传
-      if (res.data.code == 0) {
+      if (res.data.code === 0) {
         console.log(fileStatus[res.data.code]);
       }
 
       let formDataList = []; // 准备参数数组
 
       // 说明没有上传过，组装一下，直接使用
-      if (this.doneFileList.length == 0) {
+      if (this.doneFileList.length === 0) {
         formDataList = chunks.map((item, index) => {
           // 后端接参大致有：文件片、文件分的片数、每次上传是第几片(索引)、文件名、此完整大文件hash值
           // 具体后端定义的参数prop属性名，看他们如何定义的，这个无妨...
@@ -176,15 +202,57 @@ export default {
         // 最后再告知后端合并一下已经上传的文件碎片了即可
         const res = await tellBackendMergeFn(fileName, this.fileHash, this.chunksCount);
         if (res.data.resultCode === 200) {
+          this.nextShow = true;
           console.log("文件并合成功");
+          const urlres = await previewingVideo(this.fileHash);
+          this.playerOptions['sources'][0]['src'] = urlres.data.data;
         }
       });
     },
+
+    // 定义播放或暂停的方法
+			playOrStop() {
+				if (this.playing) {
+					this.$refs.videoPlayer.player.pause();
+					this.playing = false;
+				} else {
+					this.$refs.videoPlayer.player.play();
+					this.playing = true;
+				}
+			},
+      // 自动播放第一个视频
+			autoPlayAction() {
+				if (this.index == 0) {
+					this.playerOptions.autoplay = true;
+				}
+			},
   },
+  components: {
+    videoPlayer
+  }
 };
 </script>
 
 <style>
+.videos {
+		position: relative;
+	}
+
+/* 定义播放按钮的样式 */
+.videos .vjs-default-skin>.video-js .vjs-big-play-button {
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 30px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  line-height: 36px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+  margin-top: 0;
+  margin-left: 0;
+}
 .pieceItem {
   width: 36px;
   height: 36px;

@@ -16,10 +16,17 @@ Vue.use(VueAwesomeSwiper);
 import 'vue-video-player/src/custom-theme.css'
 import 'video.js/dist/video-js.css'
 
+// ElementUI
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+Vue.use(ElementUI);
+
 // 自定义弹窗
 import Toast from './components/toast/toast.js'
 // 将组件注册到vue的原型链,这样就可以在所有的VUE的实例里面使用this.$toast()
 Vue.prototype.$toast=Toast   //注册全局组件
+
+
 
 import uploader from 'vue-simple-uploader'
 Vue.use(uploader)
@@ -37,6 +44,7 @@ Axios.interceptors.request.use(function (config) {
   // 对请求错误做些什么
   return Promise.reject(error)
 })
+
 
 
 // 添加响应拦截器

@@ -102,3 +102,16 @@ export function tellBackendMergeFn(fileName, fileMd5, chunkTotal) {
           }}))
     })
 }
+
+/**
+ * 通过后端传入的外链预览视频
+ */
+export function previewingVideo(fileMd5){
+    const data= {fileMd5: fileMd5};
+    return new Promise((resolve, reject) => {
+        resolve(axios.post('http://localhost:8020/douyin_publish/publish/downloadCreative', data,{headers: {
+            'Content-Type': 'application/json',
+            'authorization': localStorage.getItem('authorization')
+          }}))
+    })
+} 
