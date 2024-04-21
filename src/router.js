@@ -36,9 +36,9 @@ const router=new Router({
 					]
 				},
 				{
-					path:'/publist',
-					name:'publist',
-					component:()=>import('./views/publist/Publist.vue')
+					path:'/Upload',
+					name:'Upload',
+					component:()=>import('./views/publist/Upload.vue')
 				},
 				{
 					path:'/follow',
@@ -81,6 +81,12 @@ const router=new Router({
 			name:'/edit',
 			component:()=> import('./views/me/Edit.vue')
 		},
+		//编辑作品描述
+		{
+			path:'/Publist',
+			name:'/Publist',
+			component:()=> import('./views/publist/Publist.vue')
+		},
 		
 	]
 });
@@ -89,6 +95,9 @@ router.beforeEach((to, from, next) => {
 	if (to.path === '/sign' ||to.path === '/index' || to.path==='/tbsign') 
 		return next();
 	if (to.path === '/code' && from.path == '/sign'){
+		return next();
+	}
+	if(to.path === '/Publist' && from.path == '/Upload'){
 		return next();
 	}
 	//获取token

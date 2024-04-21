@@ -89,6 +89,20 @@ export function uploadNormalFile(formData) {
     })
 }
 
+/*
+* 上传视频封面
+* */
+export function uploadCoverFile(formData) {
+    // const data= {'fileData': formData};
+    return new Promise((resolve, reject) => {
+        resolve(axios.post('http://localhost:8020/douyin_publish/publish/uploadCover',formData,{headers: {
+            // 'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
+            'authorization': localStorage.getItem('authorization')
+          }}))
+    })
+}
+
 /**
  * 告知后端要去合并前端上传的文件了
  * */
@@ -110,6 +124,19 @@ export function previewingVideo(fileMd5){
     const data= {fileMd5: fileMd5};
     return new Promise((resolve, reject) => {
         resolve(axios.post('http://localhost:8020/douyin_publish/publish/downloadCreative', data,{headers: {
+            'Content-Type': 'application/json',
+            'authorization': localStorage.getItem('authorization')
+          }}))
+    })
+} 
+
+/**
+ * 通过后端传入的外链预览封面
+ */
+export function previewingCover(mediaId){
+    const data= {mediaId: mediaId};
+    return new Promise((resolve, reject) => {
+        resolve(axios.post('http://localhost:8020/douyin_publish/publish/downloadCover', data,{headers: {
             'Content-Type': 'application/json',
             'authorization': localStorage.getItem('authorization')
           }}))

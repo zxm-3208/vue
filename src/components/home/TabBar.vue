@@ -12,7 +12,7 @@
         </div>
 
         <div class="item" @click="changeTab(2)">
-            <router-link to="/publist" tag="span" :class="tabIndex==2?'active':''">
+            <router-link to="/Upload" tag="span" :class="tabIndex==2?'active':''">
                 <img class="add" src="../../../public/images/add.png" alt="">
             </router-link>
 
