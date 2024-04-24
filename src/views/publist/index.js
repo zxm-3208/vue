@@ -106,8 +106,8 @@ export function uploadCoverFile(formData) {
 /**
  * 告知后端要去合并前端上传的文件了
  * */
-export function tellBackendMergeFn(fileName, fileMd5, chunkTotal) {
-    const data= {fileMd5: fileMd5, fileName: fileName, chunkTotal:chunkTotal };
+export function tellBackendMergeFn(fileName, fileMd5, chunkTotal, userId) {
+    const data= {fileMd5: fileMd5, fileName: fileName, chunkTotal:chunkTotal, userId:userId };
     console.info(data);
     return new Promise((resolve, reject) => {
         resolve(axios.post('http://localhost:8020/douyin_publish/publish/mergechunks', data,{headers: {

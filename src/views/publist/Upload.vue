@@ -64,6 +64,7 @@
         fileProgress: 0, // 上传文件的进度
         mediaId: "",
         coverUrl: "",
+        userId: "",
   
         // 播放页面
         playerOptions: {
@@ -123,10 +124,11 @@
           const urlres = await previewingVideo(this.fileHash);
           this.mediaId = urlres.data.data.mediaId;
           this.playerOptions['sources'][0]['src'] = urlres.data.data.url;
-          this.nextShow=true;
           const coverRes = await previewingCover(urlres.data.data.mediaId);
+          console.info("mediaId:{}",urlres.data.data.mediaId);
           console.info("coverUrl:",coverRes.data.data);
           this.coverUrl = coverRes.data.data;
+          this.nextShow=true;
           return; // 拦截停下
         }
         // 等于2表示曾经上传过一部分，现在要继续上传
@@ -187,6 +189,7 @@
               formData.append("chunk", this.undoneFileList[index]);
               formData.append("name", fileName);
               formData.append("md5", fileMd5);
+              formData.append("userId", localStorage.getItem("userId"));
               return { formData };
             });
         }
@@ -199,6 +202,7 @@
         const res_num = 0;
         const requestListFn = formDataList.map(async ({ formData }, index) => {
           const res = await sliceFileUploadFn(formData);
+          console.info(res);
           // 每上传完毕一片文件，后端告知已上传了多少片，除以总片数，就是进度
           this.fileProgress = Math.ceil(
             (res.data.resultData / this.chunksCount) * 100
@@ -210,8 +214,10 @@
           // 都上传完毕了，文件上传进度条就为100%了
           this.fileProgress = 100;
           this.loadingShow = true;
+          this.userId = localStorage.getItem("userId");
+          console.info("userId", this.userId);
           // 最后再告知后端合并一下已经上传的文件碎片了即可
-          const res = await tellBackendMergeFn(fileName, this.fileHash, this.chunksCount);
+          const res = await tellBackendMergeFn(fileName, this.fileHash, this.chunksCount, this.userId);
           if (res.data.resultCode === 200) {
             this.mediaId = res.data.mediaId;
             this.nextShow = true;

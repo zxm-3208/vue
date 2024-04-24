@@ -69,8 +69,9 @@
 					})
 					console.info(res)
 					if(res.data.code=="200"){
-						// 登录成功，将Token存储在内存中
+						// 登录成功，将Token和用户ID存储在内存中
 						localStorage.setItem('authorization',"Bearer "+res.data.data.authorization)
+						localStorage.setItem('userId', res.data.data.userId)
 						// 跳转到首页或其他需要登录的页面
 						this.$router.push({ path:"/me"})
 					}

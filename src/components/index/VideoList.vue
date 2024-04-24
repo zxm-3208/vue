@@ -220,25 +220,27 @@
 					}
                 },
 				dataList:[
-					{
-						id:"1",
-						url:"../../../vedios/1565225654682.mp4"
-					},
-					{
-						id:"2",
-						url:"../../../vedios/VID_20200610_225331.mp4"
-					},
-					{
-						id:"3",
-						url:"../../../vedios/wx_camera_1575988910049.mp4"
-					}
+					// {
+					// 	id:"1",
+					// 	url:"../../../vedios/1565225654682.mp4"
+					// },
+					// {
+					// 	id:"2",
+					// 	url:"../../../vedios/VID_20200610_225331.mp4"
+					// },
+					// {
+					// 	id:"3",
+					// 	url:"../../../vedios/wx_camera_1575988910049.mp4"
+					// }
 				]
 				
 				
             }
             
         },
-        
+        created(){
+			this.loadingMedia();
+		},
         methods:{
 			playAction(index){
 				this.$refs.videos[index].playOrStop()
@@ -261,8 +263,32 @@
 			// 关闭评论框
 			close(){
 				this.showComment=false;
+			},
+			async loadingMedia(){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_publish/showlist/publist',{
+						"userId": localStorage.getItem('userId')
+					}
+					,
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+					console.info(res)
+					if(res.data.code=="200"){
+						this.publistNum = res.data.data.url.length;
+						this.publist = res.data.data.url;
+						this.mediaId = res.data.data.mediaId;
+					}
+					else{
+						this.$toast('获取发布视频数据失败！')
+
+					}
+				}catch(err){
+					console.error(err);
+				}
 			}
-			
 			
 		}
 		

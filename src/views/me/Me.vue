@@ -39,16 +39,14 @@
 			</div>
 			<div class="me-tab">
 				<div class="me-navbar">
-					<div class="item" @click="changeTab(0)" :class="indexTab==0?'active':'' ">作品&nbsp;11</div>
-					<div class="item" @click="changeTab(1)" :class="indexTab==1?'active':'' ">动态&nbsp;22</div>
-					<div class="item" @click="changeTab(2)" :class="indexTab==2?'active':'' ">喜欢&nbsp;33</div>
+					<div class="item" @click="changeTab(0)" :class="indexTab==0?'active':'' ">作品&nbsp;{{publistNum}}</div>
+					<div class="item" @click="changeTab(1)" :class="indexTab==1?'active':'' ">收藏&nbsp;{{collectNum}}</div>
+					<div class="item" @click="changeTab(2)" :class="indexTab==2?'active':'' ">喜欢&nbsp;{{likeNum}}</div>
 				</div>
 				<div class="tab-wrap">
 					<div class="tab-con" v-show="indexTab==0">
 						<div class="tab-img">
-							<img src="../../../public/images/001.jpg" />
-							<img src="../../../public/images/002.jpg" />
-							<img src="../../../public/images/003.jpg" />
+							<img mode="widthFix" class="img" v-for="(item, index) in publist" :key="index" :src="item"  @load="onImgLoad" @click="handleClick(index)"/>
 						</div>
 					</div>
 					<div class="tab-con" v-show="indexTab==1">
@@ -77,13 +75,28 @@
 		name:"Me",
 		data(){
 			return{
+				mediaId: [],
+
 				bgPic:{
 					backgroundImage:'url('+require('../../../public/images/bg.jpg')+')',
 					backgroundRepeat:'no-repeat',
 					backgroundSize:'100% 100%'
 				},
-				indexTab:0,
+				indexTab: 0,
+				imgHeight: 0,
+				
+				publist: [],
+				publistNum: 0,
+
+				collectList: [],
+				collectNum: 0,
+
+				likeList: [],
+				likeNum: 0,
 			}
+		},
+		created(){
+			this.getPublistImg();
 		},
 		methods:{
 			changeTab(index){
@@ -100,11 +113,64 @@
 				})
                 .then(
                     localStorage.removeItem('authorization'),
+					localStorage.removeItem('userId'),
 					this.$router.push('/sign')
                 )
                 .catch(error => {
                     console.error(error);
                 });
+			},
+			async getPublistImg(){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_publish/showlist/publist',{
+						"userId": localStorage.getItem('userId')
+					}
+					,
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+					console.info(res)
+					if(res.data.code=="200"){
+						this.publistNum = res.data.data.url.length;
+						this.publist = res.data.data.url;
+						this.mediaId = res.data.data.mediaId;
+					}
+					else{
+						this.$toast('获取发布视频数据失败！')
+
+					}
+				}catch(err){
+					console.error(err);
+				}
+			},
+			onImgLoad(e) {
+				// 当图片加载完成后，获取图片的原始宽度和高度，并根据宽度计算出高度
+				this.imgHeight = (e.target.height / e.target.width) * 100; // 高度 = 原始高度 / 原始宽度 * 100
+			},
+			async handleClick(index){
+				console.info(index)
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_publish/showlist/clickPlay',{
+						"mediaId": this.mediaId[index]
+					}
+					,
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+					if(res.data.code=="200"){
+						console.info(res);
+					}
+					else{
+						this.$toast('获取视频数据失败！')
+
+					}
+				}catch(err){
+					console.error(err);
+				}
 			},
 			hello(){
 				axios.get('http://localhost:8020/douyin_auth/user/hello', {
@@ -236,8 +302,33 @@
 		border-bottom: 2px solid #ffdf0e;
 		color: #FFFFFF;		
 	} 
-	.tab-img img{
-		width: 33.3%;
+	.tab-img{
+		max-width: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		background: #000000;
+		object-fit: contain;
+		/* height: 250px;
+		background: #f2f2f2;
+		justify-content: center;
+		align-items: center; */
+	}
+	.img{
+		width: calc(33.33% - 4px);
+		margin: 2px;
+		max-height: 100%;
+		background: #000000;
+		object-fit: contain;
+	}
+	.tab-con{
+		max-width: 100%;
+		max-height: 100%;
+		display: flex;
+		justify-content: left;
+		align-items: left;
+	}
+	.tab-wrap{
+		height: auto;
 	}
 	.exit_icon{
 		height: 40px;
