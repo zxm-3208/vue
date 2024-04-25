@@ -149,28 +149,31 @@
 				// 当图片加载完成后，获取图片的原始宽度和高度，并根据宽度计算出高度
 				this.imgHeight = (e.target.height / e.target.width) * 100; // 高度 = 原始高度 / 原始宽度 * 100
 			},
-			async handleClick(index){
-				console.info(index)
-				try{
-					let res = await axios.post('http://localhost:8020/douyin_publish/showlist/clickPlay',{
-						"mediaId": this.mediaId[index]
-					}
-					,
-					{
-						headers: {
-							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
-						}
-					})
-					if(res.data.code=="200"){
-						console.info(res);
-					}
-					else{
-						this.$toast('获取视频数据失败！')
+			handleClick(index){
+				this.$router.push({ path:"/UserPublist", query:{mediaIdList: this.mediaId, index: index}});
 
-					}
-				}catch(err){
-					console.error(err);
-				}
+				// try{
+				// 	console.info(this.mediaId[index])
+				// 	let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/clickPlay',{
+				// 		"userId": this.userId,
+				// 		"mediaIdList": this.mediaId,
+				// 	}
+				// 	,
+				// 	{
+				// 		headers: {
+				// 			'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+				// 		}
+				// 	})
+				// 	if(res.data.code=="200"){
+				// 		this.$router.push({ path:"/index?mediaIdList="+res.data.data});
+				// 	}
+				// 	else{
+				// 		this.$toast('获取视频数据失败！')
+
+				// 	}
+				// }catch(err){
+				// 	console.error(err);
+				// }
 			},
 			hello(){
 				axios.get('http://localhost:8020/douyin_auth/user/hello', {

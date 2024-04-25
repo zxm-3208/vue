@@ -1,9 +1,11 @@
 <!-- 视频列表组件，保护视频播放组件 -->
 <template>
+	
     <div class="video-list">
-        <swiper :options="swiperOption">
-    <!-- 幻灯内容 -->
-    <swiper-slide v-for="(item,index) in dataList" :key="index">
+		<myheader class="header" title="作品列表" hasLeft="true" rightTxt="false" @changeBack="toBack"></myheader>
+		<swiper :options="swiperOption">
+		<!-- 幻灯内容 -->
+		<swiper-slide v-for="(item,index) in dataList" :key="index">
 		<div  class="vedioParent">
 			<videos class="vedioChild" ref="videos" :videoList="item" :index="index"></videos>
 		</div>
@@ -174,9 +176,10 @@
     import { Swiper, SwiperSlide } from 'vue-awesome-swiper'    //导入组件
     import 'swiper/swiper-bundle.css'
 	import axios from 'axios'
-	import Videos from './Videos'
-	import InfoBar from './InfoBar.vue'
-	import RightBar from './RightBar.vue'
+	import Videos from '../../components/index/Videos'
+	import InfoBar from '../../components/index/InfoBar.vue'
+	import RightBar from '../../components/index/RightBar.vue'
+	import Myheader from '../../components/header/Myheader.vue';
 	export default{
         name:'videoList',
         components: {
@@ -184,7 +187,8 @@
             Swiper,
 			Videos,
 			InfoBar,
-			RightBar
+			RightBar,
+			Myheader,
         },
         data(){
             return {
@@ -240,9 +244,12 @@
             
         },
         created(){
-			this.getAllPublistUrl();
+			this.getPublistUrl();
 		},
         methods:{
+			toBack(){
+				this.$router.push('/me')
+			},
 			playAction(index){
 				this.$refs.videos[index].playOrStop()
 			},
@@ -265,17 +272,20 @@
 			close(){
 				this.showComment=false;
 			},
-			async getAllPublistUrl(){
+			async getPublistUrl(){
 				try{
-					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getAllPublist',{
-
-					},
+					this.mediaId = this.$route.query.mediaIdList
+					console.info(this.mediaId)
+					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/clickPlay',{
+						"userId": this.userId,
+						"mediaIdList": this.mediaId,
+					}
+					,
 					{
 						headers: {
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
-					console.info("====",res)
 					if(res.data.code=="200"){
 						this.MediaIdList = res.data.data;
 						console.info(this.MediaIdList);
@@ -283,7 +293,8 @@
 						this.headleLoadingMedia(this.MediaIdList);
 					}
 					else{
-						this.$toast('获取发布视频数据失败！')
+						this.$toast('获取视频数据失败！')
+
 					}
 				}catch(err){
 					console.error(err);
@@ -293,7 +304,7 @@
 				console.info("xxx",MediaIdList);
 				try{
 
-					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUrl',{
+					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUserUrl',{
 						"mediaIdList": MediaIdList
 					}
 					,

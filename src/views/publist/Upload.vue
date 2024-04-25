@@ -233,7 +233,7 @@
       },
       nextStep(){
         console.info(this.mediaId,this.coverUrl);
-        this.$router.push('/Publist?mediaId='+this.mediaId+"&coverURL="+this.coverUrl);
+        this.$router.push('/Publist?mediaId='+this.mediaId+"&coverURL="+this.coverUrl+"&mediaUrl="+this.playerOptions['sources'][0]['src']);
       },
       // 定义播放或暂停的方法
       playOrStop() {

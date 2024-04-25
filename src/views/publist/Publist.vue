@@ -116,6 +116,8 @@
 					let res = await axios.post('http://localhost:8020/douyin_publish/publish/editPublist',{
 						"title": this.introduction_text,
 						"mediaId": this.$route.query.mediaId,
+						"coverUrl": this.icon_url,
+						"mediaUrl": this.$route.query.mediaUrl,
 					})
 					console.info(res)
 					if(res.data.resultCode=="200"){

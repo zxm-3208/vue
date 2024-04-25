@@ -21,7 +21,7 @@
 					preload: 'auto',
 					fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
 					sources: [{
-						src: this.videoList.url, // 路径
+						src: this.videoList, // 路径
 						type: 'video/mp4' // 类型
 					}, ],
 					width: document.documentElement.clientWidth,

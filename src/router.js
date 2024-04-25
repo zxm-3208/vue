@@ -48,13 +48,20 @@ const router=new Router({
 				{
 					path:'/me',
 					name:'me',
-					component:()=>import('./views/me/Me.vue')
+					component:()=>import('./views/me/Me.vue'),
+					// children:[
+					// 	{
+					// 		path:'/UserPublist',
+					// 		name:'/me',
+					// 		component:()=> import('./views/me/VideoList.vue')
+					// 	},
+					// ]
 				},
 				{
 					path:'/msg',
 					name:'/msg',
 					component:()=> import('./views/msg/Msg.vue')
-				}
+				},
 			]
 		},
 		// 验证码登录组件
@@ -86,6 +93,12 @@ const router=new Router({
 			path:'/Publist',
 			name:'/Publist',
 			component:()=> import('./views/publist/Publist.vue')
+		},
+		// 用户作品列表
+		{
+			path:'/UserPublist',
+			name:'/me',
+			component:()=> import('./views/me/VideoList.vue')
 		},
 		
 	]
