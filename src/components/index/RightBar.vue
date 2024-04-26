@@ -22,6 +22,7 @@
 			<span class="iconfont icon-fenxiang"></span>
 			<p>123w</p>
 		</div>
+
 		<div class="rightBar-item1">
 			<div class="right-music">
 				<img src="../../../public/images/head.jpg" alt="">
