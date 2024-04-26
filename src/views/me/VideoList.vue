@@ -192,6 +192,9 @@
         },
         data(){
             return {
+				lastId: 0,
+				offset: 0,
+
 				showComment:false,
 				page:1,
                 swiperOption: {
@@ -238,7 +241,7 @@
 					// }
 				],
 				MediaIdList:[],
-				
+				userId:'',
 				
             }
             
@@ -273,11 +276,12 @@
 				this.showComment=false;
 			},
 			async getPublistUrl(){
+				this.lastId = Date.parse(new Date());
 				try{
+					this.userId = localStorage.getItem('userId')
+					this.page = this.$route.query.index;
 					this.mediaId = this.$route.query.mediaIdList
-					console.info(this.mediaId)
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/clickPlay',{
-						"userId": this.userId,
 						"mediaIdList": this.mediaId,
 					}
 					,
@@ -288,7 +292,6 @@
 					})
 					if(res.data.code=="200"){
 						this.MediaIdList = res.data.data;
-						console.info(this.MediaIdList);
 						// 获取外链
 						this.headleLoadingMedia(this.MediaIdList);
 					}
@@ -301,10 +304,11 @@
 				}
 			},
 			async headleLoadingMedia(MediaIdList){
-				console.info("xxx",MediaIdList);
 				try{
-
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUserUrl',{
+						"userId": this.userId,
+						"lastId": this.lastId,
+						"offset": this.offset,
 						"mediaIdList": MediaIdList
 					}
 					,
@@ -313,16 +317,17 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
-					console.info("----",res)
 					if(res.data.code=="200"){
-						for(var i = 0; i < res.data.data.length; i++) {
+						this.lastId = res.data.data.minTime;
+						this.offset = res.data.data.offset;
+						for(var i = 0; i < res.data.data.url.length; i++) {
 							// var map = {
 							// 	"id": i+1,
 							// 	"url": res.data.data[i]
 							// }
-							this.dataList.push(res.data.data[i]);
+							this.dataList.push(res.data.data.url[i]);
 						}
-						console.info(this.dataList);
+						console.info("xxx:",this.dataList);
 					}
 					else{
 						this.$toast('获取发布视频数据失败！')

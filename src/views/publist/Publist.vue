@@ -114,6 +114,7 @@
 				this.introduction_text = document.getElementById("textAreaIntroduction").value;
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_publish/publish/editPublist',{
+						"userId": localStorage.getItem('userId'),
 						"title": this.introduction_text,
 						"mediaId": this.$route.query.mediaId,
 						"coverUrl": this.icon_url,

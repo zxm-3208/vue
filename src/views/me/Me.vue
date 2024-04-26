@@ -76,6 +76,8 @@
 		data(){
 			return{
 				mediaId: [],
+				lastId: 0,
+				offset: 0,
 
 				bgPic:{
 					backgroundImage:'url('+require('../../../public/images/bg.jpg')+')',
@@ -121,9 +123,12 @@
                 });
 			},
 			async getPublistImg(){
+				this.lastId = Date.parse(new Date());
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_publish/showlist/publist',{
-						"userId": localStorage.getItem('userId')
+						"userId": localStorage.getItem('userId'),
+						"lastId": this.lastId,
+						"offset": this.offset,
 					}
 					,
 					{
@@ -131,11 +136,13 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
-					console.info(res)
+					console.info("====",res)
 					if(res.data.code=="200"){
-						this.publistNum = res.data.data.url.length;
+						this.publistNum = res.data.data.mediaCount;
 						this.publist = res.data.data.url;
 						this.mediaId = res.data.data.mediaId;
+						this.lastId = res.data.data.minTime;
+						this.offset = res.data.data.offset;
 					}
 					else{
 						this.$toast('获取发布视频数据失败！')

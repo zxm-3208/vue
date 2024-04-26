@@ -234,8 +234,9 @@
 					// }
 				],
 				MediaIdList:[],
-				
-				
+				userId: [],
+				lastId: 0,
+				offset: 0,
             }
             
         },
@@ -266,6 +267,7 @@
 				this.showComment=false;
 			},
 			async getAllPublistUrl(){
+				this.lastId = Date.parse(new Date());
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getAllPublist',{
 
@@ -290,10 +292,13 @@
 				}
 			},
 			async headleLoadingMedia(MediaIdList){
-				console.info("xxx",MediaIdList);
+				this.userId = localStorage.getItem('userId');
 				try{
 
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUrl',{
+						"userId": this.userId,
+						"lastId": this.lastId,
+						"offset": this.offset,
 						"mediaIdList": MediaIdList
 					}
 					,
@@ -304,12 +309,14 @@
 					})
 					console.info("----",res)
 					if(res.data.code=="200"){
-						for(var i = 0; i < res.data.data.length; i++) {
+						this.lastId = res.data.data.minTime;
+						this.offset = res.data.data.offset;
+						for(var i = 0; i < res.data.data.url.length; i++) {
 							// var map = {
 							// 	"id": i+1,
 							// 	"url": res.data.data[i]
 							// }
-							this.dataList.push(res.data.data[i]);
+							this.dataList.push(res.data.data.url[i]);
 						}
 						console.info(this.dataList);
 					}
