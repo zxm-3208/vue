@@ -99,7 +99,7 @@ const router=new Router({
 			path:'/UserPublist',
 			name:'/me',
 			component:()=> import('./views/me/VideoList.vue')
-		},
+		}
 		
 	]
 });

@@ -16,7 +16,7 @@
 		<!-- 右侧列表 -->
 		<div class="right_warp">
 			<!-- 父组件接收子组件的方法 -->
-			<right-bar @changeCom="showCom"></right-bar>
+			<right-bar @changeCom="showCom" @changeLike="clickLike" :plikeCount="likeCount" :plikeFlag="likeFlag"></right-bar>
 		</div>
 
 	</swiper-slide>   
@@ -219,24 +219,16 @@
 						},
 					}
                 },
-				dataList:[
-					// {
-					// 	id:"1",
-					// 	url:"../../../vedios/1565225654682.mp4"
-					// },
-					// {
-					// 	id:"2",
-					// 	url:"../../../vedios/VID_20200610_225331.mp4"
-					// },
-					// {
-					// 	id:"3",
-					// 	url:"../../../vedios/wx_camera_1575988910049.mp4"
-					// }
-				],
-				MediaIdList:[],
+				dataList:[],
+				mediaIdList:[],
+				mediaindex: -1,
 				userId: [],
 				lastId: 0,
 				offset: 0,
+				likeCount: 0,
+				commentCount: 0,
+				forwardCount: 0,
+				likeFlag: -1,
             }
             
         },
@@ -251,16 +243,88 @@
 			preVideo(index){
 				this.$refs.videos[index+1].stop()
 				this.$refs.videos[index].play()
+				this.mediaindex = this.mediaindex + 1
 			},
 			// 下滑
 			nextVideo(index){
 				this.$refs.videos[index-1].stop()
 				this.$refs.videos[index].play()
+				this.mediaindex = this.mediaindex - 1
 			},
 
 			// 弹出评论框
 			showCom(){
 				this.showComment=true;
+			},
+			async clickLike(){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/likes/mediaLike',{
+						"userId": this.userId, 
+						"mediaId": this.mediaIdList[this.mediaindex]
+					})
+					if(res.data.code=="200"){
+						if(res.data.code=="200"){
+							console.info("111")
+						}
+						else{
+							this.$toast('点赞失败！')
+
+						}
+					}
+					else{
+						this.$toast('点赞失败！')
+					}
+				}
+				catch(err){
+					console.error(err);
+				}
+				this.getLikeCount();
+				this.getInitLikeFalg();
+			},
+			async getLikeCount(){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/likes/getLikeCount',{
+						"userId": this.userId,
+						"mediaId": this.mediaIdList[this.mediaindex]
+					},
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+					if(res.data.code=="200"){
+						this.likeCount = res.data.data
+						console.info("likeCount:", this.likeCount)
+					}
+					else{
+						this.$toast('获取视频点赞数量失败！')
+					}
+				}catch(err){
+					console.error(err);
+				}
+			},
+			async getInitLikeFalg(){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/likes/initLikeFlag',{
+						"userId": this.userId,
+						"mediaId": this.mediaIdList[this.mediaindex]
+					},
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+					console.info(res)
+					if(res.data.code=="200"){
+						this.likeFlag = res.data.data
+						console.info("FLag:",this.likeFlag)
+					}
+					else{
+						this.$toast('获取视频点赞数量失败！')
+					}
+				}catch(err){
+					console.error(err);
+				}
 			},
 			// 关闭评论框
 			close(){
@@ -269,20 +333,18 @@
 			async getAllPublistUrl(){
 				this.lastId = Date.parse(new Date());
 				try{
+					this.userId = localStorage.getItem('userId');
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getAllPublist',{
-
 					},
 					{
 						headers: {
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
-					console.info("====",res)
 					if(res.data.code=="200"){
-						this.MediaIdList = res.data.data;
-						console.info(this.MediaIdList);
+						this.mediaIdList = res.data.data;
 						// 获取外链
-						this.headleLoadingMedia(this.MediaIdList);
+						this.headleLoadingMedia();
 					}
 					else{
 						this.$toast('获取发布视频数据失败！')
@@ -291,15 +353,13 @@
 					console.error(err);
 				}
 			},
-			async headleLoadingMedia(MediaIdList){
-				this.userId = localStorage.getItem('userId');
+			async headleLoadingMedia(){
 				try{
 
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUrl',{
 						"userId": this.userId,
 						"lastId": this.lastId,
 						"offset": this.offset,
-						"mediaIdList": MediaIdList
 					}
 					,
 					{
@@ -307,27 +367,46 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
-					console.info("----",res)
 					if(res.data.code=="200"){
 						this.lastId = res.data.data.minTime;
 						this.offset = res.data.data.offset;
 						for(var i = 0; i < res.data.data.url.length; i++) {
-							// var map = {
-							// 	"id": i+1,
-							// 	"url": res.data.data[i]
-							// }
 							this.dataList.push(res.data.data.url[i]);
 						}
-						console.info(this.dataList);
+						this.mediaindex = this.mediaindex + res.data.data.url.length;
 					}
 					else{
 						this.$toast('获取发布视频数据失败！')
-
 					}
 				}catch(err){
 					console.error(err);
 				}
-			}
+				this.getLikeCount();
+				this.getInitLikeFalg();
+			},
+			// async initLike(){
+			// 	try{
+			// 		let res = await axios.post('http://localhost:8020/douyin_user/likes/initLike',{
+			// 			"userId": this.userId, 
+			// 			"mediaId": this.mediaIdList[this.mediaindex]
+			// 		})
+			// 		if(res.data.code=="200"){
+			// 			console.info(res)
+			// 			if(res.data.code=="200"){
+			// 				this.likeFlag = res.data.data
+			// 			}
+			// 			else{
+			// 				this.$toast('初始化点赞失败！')
+
+			// 			}
+			// 		}
+			// 		else{
+			// 			this.$toast('初始化点赞失败！')
+			// 		}
+			// 	}catch(err){
+			// 		console.error(err);
+			// 	}
+			// },
 			
 		}
 		

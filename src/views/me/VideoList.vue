@@ -1,176 +1,169 @@
 <!-- 视频列表组件，保护视频播放组件 -->
 <template>
-	
-    <div class="video-list">
+	<div class="video-list">
 		<myheader class="header" title="作品列表" hasLeft="true" rightTxt="false" @changeBack="toBack"></myheader>
 		<swiper :options="swiperOption">
-		<!-- 幻灯内容 -->
-		<swiper-slide v-for="(item,index) in dataList" :key="index">
-		<div  class="vedioParent">
-			<videos class="vedioChild" ref="videos" :videoList="item" :index="index"></videos>
-		</div>
-
-		<!-- 底部说明 -->
-		<div class="infobar_warp">
-			<info-bar></info-bar>
-		</div>
-
-		<!-- 右侧列表 -->
-		<div class="right_warp">
-			<!-- 父组件接收子组件的方法 -->
-			<right-bar @changeCom="showCom"></right-bar>
-		</div>
-
-	</swiper-slide>   
-</swiper>
-
-
-
-<!-- 评论 -->
-<transition name="up">
-<div class="comment-warp-box" v-if="showComment">
-	<div class="comment-warp">
-		<div class="comment-list">
-			<div class="comment-top">
-				<div class="number">15.0w条评论</div>
-				<div class="close" @click="close"><span class="iconfont icon-shanchu"></span></div>
-			</div>
-			<div class="comment-body">
-				<div class="comment-box">
-					<div class="comment-item">
-						<div class="user-pic">
-							<img src="../../../public/images/head1.jpg" alt="">
-						</div>
-						<div class="item-info">
-							<div class="reply">
-								<p class="name">安安</p>
-								<p class="reply-des">要加班今晚要加班要加班今晚要加班要加班今晚要加班要加班今晚要加班<span class="time">05-20</span></p>
-							</div>
-							<div class="zan">
-								<span class="iconfont icon-aixin"></span>
-								<p>200</p>
-							</div>
-						</div>
-					</div>
-					<!-- 回复 -->
-					<div class="sub-comment-item">
-						<div class="user-pic">
-							<img src="../../../public/images/head1.jpg" alt="">
-						</div>
-						<div class="item-info">
-							<div class="reply">
-								<p class="name">拉西</p>
-								<p class="reply-des">
-									<span>回复</span>
-									<span class="re-name">安安：</span>
-									<span>123</span>
-									<span class="time">05-20</span>
-								</p>
-							</div>
-							<div class="zan">
-								<span class="iconfont icon-aixin"></span>
-								<p>200</p>
-							</div>
-						</div>
-					</div>
-					<!-- 回复条数 -->
-					<div class="more">展开更多回复</div>
-					
-					<div class="comment-item">
-						<div class="user-pic">
-							<img src="../../../public/images/head1.jpg" alt="">
-						</div>
-						<div class="item-info">
-							<div class="reply">
-								<p class="name">安安</p>
-								<p class="reply-des">要加班今晚要加班要加班今晚要加班要加班今晚要加班要加班今晚要加班<span class="time">05-20</span></p>
-							</div>
-							<div class="zan">
-								<span class="iconfont icon-aixin"></span>
-								<p>200</p>
-							</div>
-						</div>
-					</div>
-					<!-- 回复 -->
-					<div class="sub-comment-item">
-						<div class="user-pic">
-							<img src="../../../public/images/head1.jpg" alt="">
-						</div>
-						<div class="item-info">
-							<div class="reply">
-								<p class="name">拉西</p>
-								<p class="reply-des">
-									<span>回复</span>
-									<span class="re-name">安安：</span>
-									<span>123</span>
-									<span class="time">05-20</span>
-								</p>
-							</div>
-							<div class="zan">
-								<span class="iconfont icon-aixin"></span>
-								<p>200</p>
-							</div>
-						</div>
-					</div>
-					<!-- 回复条数 -->
-					<div class="more">展开更多回复</div>
-					
-					<div class="comment-item">
-						<div class="user-pic">
-							<img src="../../../public/images/head1.jpg" alt="">
-						</div>
-						<div class="item-info">
-							<div class="reply">
-								<p class="name">安安</p>
-								<p class="reply-des">要加班今晚要加班要加班今晚要加班要加班今晚要加班要加班今晚要加班<span class="time">05-20</span></p>
-							</div>
-							<div class="zan">
-								<span class="iconfont icon-aixin"></span>
-								<p>200</p>
-							</div>
-						</div>
-					</div>
-					<!-- 回复 -->
-					<div class="sub-comment-item">
-						<div class="user-pic">
-							<img src="../../../public/images/head1.jpg" alt="">
-						</div>
-						<div class="item-info">
-							<div class="reply">
-								<p class="name">拉西</p>
-								<p class="reply-des">
-									<span>回复</span>
-									<span class="re-name">安安：</span>
-									<span>123</span>
-									<span class="time">05-20</span>
-								</p>
-							</div>
-							<div class="zan">
-								<span class="iconfont icon-aixin"></span>
-								<p>200</p>
-							</div>
-						</div>
-					</div>
-					<!-- 回复条数 -->
-					<div class="more">展开更多回复</div>
-					
-					<!-- 评论框 -->
-					<div class="reply-input">
-						<input type="text" id="" placeholder="留下你精彩的评论">
-						<span class="emoji">@</span>
-						<span class="iconfont icon-pinglun"></span>
-					</div>
+			<!-- 幻灯内容 -->
+			<swiper-slide v-for="(item,index) in dataList" :key="index">
+				<div  class="vedioParent">
+					<videos class="vedioChild" ref="videos" :videoList="item" :index="index"></videos>
 				</div>
-					
+
+				<!-- 底部说明 -->
+				<div class="infobar_warp">
+					<info-bar></info-bar>
+				</div>
+
+				<!-- 右侧列表 -->
+				<div class="right_warp">
+					<!-- 父组件接收子组件的方法 -->
+					<right-bar @changeCom="showCom"></right-bar>
+				</div>
+			</swiper-slide>   
+		</swiper>
+		<!-- 评论 -->
+		<transition name="up">
+		<div class="comment-warp-box" v-if="showComment">
+			<div class="comment-warp">
+				<div class="comment-list">
+					<div class="comment-top">
+						<div class="number">15.0w条评论</div>
+						<div class="close" @click="close"><span class="iconfont icon-shanchu"></span></div>
+					</div>
+					<div class="comment-body">
+						<div class="comment-box">
+							<div class="comment-item">
+								<div class="user-pic">
+									<img src="../../../public/images/head1.jpg" alt="">
+								</div>
+								<div class="item-info">
+									<div class="reply">
+										<p class="name">安安</p>
+										<p class="reply-des">要加班今晚要加班要加班今晚要加班要加班今晚要加班要加班今晚要加班<span class="time">05-20</span></p>
+									</div>
+									<div class="zan">
+										<span class="iconfont icon-aixin"></span>
+										<p>200</p>
+									</div>
+								</div>
+							</div>
+							<!-- 回复 -->
+							<div class="sub-comment-item">
+								<div class="user-pic">
+									<img src="../../../public/images/head1.jpg" alt="">
+								</div>
+								<div class="item-info">
+									<div class="reply">
+										<p class="name">拉西</p>
+										<p class="reply-des">
+											<span>回复</span>
+											<span class="re-name">安安：</span>
+											<span>123</span>
+											<span class="time">05-20</span>
+										</p>
+									</div>
+									<div class="zan">
+										<span class="iconfont icon-aixin"></span>
+										<p>200</p>
+									</div>
+								</div>
+							</div>
+							<!-- 回复条数 -->
+							<div class="more">展开更多回复</div>
+							
+							<div class="comment-item">
+								<div class="user-pic">
+									<img src="../../../public/images/head1.jpg" alt="">
+								</div>
+								<div class="item-info">
+									<div class="reply">
+										<p class="name">安安</p>
+										<p class="reply-des">要加班今晚要加班要加班今晚要加班要加班今晚要加班要加班今晚要加班<span class="time">05-20</span></p>
+									</div>
+									<div class="zan">
+										<span class="iconfont icon-aixin"></span>
+										<p>200</p>
+									</div>
+								</div>
+							</div>
+							<!-- 回复 -->
+							<div class="sub-comment-item">
+								<div class="user-pic">
+									<img src="../../../public/images/head1.jpg" alt="">
+								</div>
+								<div class="item-info">
+									<div class="reply">
+										<p class="name">拉西</p>
+										<p class="reply-des">
+											<span>回复</span>
+											<span class="re-name">安安：</span>
+											<span>123</span>
+											<span class="time">05-20</span>
+										</p>
+									</div>
+									<div class="zan">
+										<span class="iconfont icon-aixin"></span>
+										<p>200</p>
+									</div>
+								</div>
+							</div>
+							<!-- 回复条数 -->
+							<div class="more">展开更多回复</div>
+							
+							<div class="comment-item">
+								<div class="user-pic">
+									<img src="../../../public/images/head1.jpg" alt="">
+								</div>
+								<div class="item-info">
+									<div class="reply">
+										<p class="name">安安</p>
+										<p class="reply-des">要加班今晚要加班要加班今晚要加班要加班今晚要加班要加班今晚要加班<span class="time">05-20</span></p>
+									</div>
+									<div class="zan">
+										<span class="iconfont icon-aixin"></span>
+										<p>200</p>
+									</div>
+								</div>
+							</div>
+							<!-- 回复 -->
+							<div class="sub-comment-item">
+								<div class="user-pic">
+									<img src="../../../public/images/head1.jpg" alt="">
+								</div>
+								<div class="item-info">
+									<div class="reply">
+										<p class="name">拉西</p>
+										<p class="reply-des">
+											<span>回复</span>
+											<span class="re-name">安安：</span>
+											<span>123</span>
+											<span class="time">05-20</span>
+										</p>
+									</div>
+									<div class="zan">
+										<span class="iconfont icon-aixin"></span>
+										<p>200</p>
+									</div>
+								</div>
+							</div>
+							<!-- 回复条数 -->
+							<div class="more">展开更多回复</div>
+							
+							<!-- 评论框 -->
+							<div class="reply-input">
+								<input type="text" id="" placeholder="留下你精彩的评论">
+								<span class="emoji">@</span>
+								<span class="iconfont icon-pinglun"></span>
+							</div>
+						</div>
+							
+					</div>
+				</div>	
 			</div>
-		</div>	
+		</div>
+		</transition>
 	</div>
-</div>
-</transition>
 
-
-
-    </div>
 </template>
 <script>
     import { Swiper, SwiperSlide } from 'vue-awesome-swiper'    //导入组件
@@ -179,7 +172,7 @@
 	import Videos from '../../components/index/Videos'
 	import InfoBar from '../../components/index/InfoBar.vue'
 	import RightBar from '../../components/index/RightBar.vue'
-	import Myheader from '../../components/header/Myheader.vue';
+	import Myheader from '../../components/header/Myheader.vue'
 	export default{
         name:'videoList',
         components: {
@@ -196,7 +189,7 @@
 				offset: 0,
 
 				showComment:false,
-				page:1,
+				page: this.$route.query.index,
                 swiperOption: {
                     direction:"vertical",
                     grabCursor: true, 
@@ -226,21 +219,7 @@
 						},
 					}
                 },
-				dataList:[
-					// {
-					// 	id:"1",
-					// 	url:"../../../vedios/1565225654682.mp4"
-					// },
-					// {
-					// 	id:"2",
-					// 	url:"../../../vedios/VID_20200610_225331.mp4"
-					// },
-					// {
-					// 	id:"3",
-					// 	url:"../../../vedios/wx_camera_1575988910049.mp4"
-					// }
-				],
-				MediaIdList:[],
+				dataList:[],
 				userId:'',
 				
             }
@@ -279,10 +258,7 @@
 				this.lastId = Date.parse(new Date());
 				try{
 					this.userId = localStorage.getItem('userId')
-					this.page = this.$route.query.index;
-					this.mediaId = this.$route.query.mediaIdList
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/clickPlay',{
-						"mediaIdList": this.mediaId,
 					}
 					,
 					{
@@ -291,9 +267,8 @@
 						}
 					})
 					if(res.data.code=="200"){
-						this.MediaIdList = res.data.data;
 						// 获取外链
-						this.headleLoadingMedia(this.MediaIdList);
+						this.headleLoadingMedia();
 					}
 					else{
 						this.$toast('获取视频数据失败！')
@@ -303,13 +278,12 @@
 					console.error(err);
 				}
 			},
-			async headleLoadingMedia(MediaIdList){
+			async headleLoadingMedia(){
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUserUrl',{
 						"userId": this.userId,
 						"lastId": this.lastId,
 						"offset": this.offset,
-						"mediaIdList": MediaIdList
 					}
 					,
 					{
@@ -321,13 +295,8 @@
 						this.lastId = res.data.data.minTime;
 						this.offset = res.data.data.offset;
 						for(var i = 0; i < res.data.data.url.length; i++) {
-							// var map = {
-							// 	"id": i+1,
-							// 	"url": res.data.data[i]
-							// }
 							this.dataList.push(res.data.data.url[i]);
 						}
-						console.info("xxx:",this.dataList);
 					}
 					else{
 						this.$toast('获取发布视频数据失败！')
@@ -500,5 +469,8 @@
 	}
 	.vedioChild{
 		flex: 1;
+	}
+	.xxxx{
+		color: #CCCCCC;
 	}
 </style>

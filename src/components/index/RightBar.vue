@@ -7,20 +7,22 @@
 			</div>
 		</div>
 		<!-- 点赞 -->
-		<div class="item-icon">
-			<span class="iconfont icon-aixin"></span>
-			<p>123w</p>
+		<div class="item-icon"  @click="clickLike">
+			<span v-if="plikeFlag==-1" class="iconfont icon-aixin"></span>
+			<span v-if="plikeFlag==1" class="iconfont icon-aixin" id="redAiXin">
+			</span>
+			<p>{{plikeCount}}</p>
 		</div>
 		<!-- 评论 -->
 		<!-- 当单击评论和评论图标时，将弹出评论信息 -->
 		<div class="item-icon" @click.stop="showCom($event)">
 			<span class="iconfont icon-pinglun"></span>
-			<p>123w</p>
+			<p>{{pcommentCount}}</p>
 		</div>
 		<!-- 分享 -->
 		<div class="item-icon">
 			<span class="iconfont icon-fenxiang"></span>
-			<p>123w</p>
+			<p>{{pforwardCount}}</p>
 		</div>
 
 		<div class="rightBar-item1">
@@ -33,11 +35,44 @@
 <script>
 	export default{
 		name:"RightBar",
-		props:['showComment'],
+		data(){
+			return{
+				// likeCount: 0,
+				pcommentCount: 0,
+				pforwardCount: 0,
+				// plikeFlag: -1,
+			}
+		},
+		props:{
+			plikeCount: {
+				type: Number,
+				required: true
+			},
+			// pcommentCount: {
+			// 	type: Number,
+			// 	required: true
+			// },
+			// pforwardCount: {
+			// 	type: Number,
+			// 	required: true
+			// },
+			plikeFlag: {
+				type: Number,
+				required: true
+			},
+		},
+		created(){
+			// this.getLikeCount();
+			// this.initlike();
+		},
 		methods:{
 			showCom(e){
 				e.preventDefault();
-				this.$emit('changeCom',this.showComment)
+				this.$emit('changeCom')
+			},
+			clickLike(){
+				// icon变化
+				this.$emit('changeLike')
 			}
 		}
 	}
@@ -105,6 +140,9 @@
 		height: 30px;
 		width: 30px;
 		border-radius: 50%;
+	}
+	#redAiXin{
+		color: #ff0000;
 	}
 	
 	@keyframes round{

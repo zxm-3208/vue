@@ -75,7 +75,6 @@
 		name:"Me",
 		data(){
 			return{
-				mediaId: [],
 				lastId: 0,
 				offset: 0,
 
@@ -136,11 +135,9 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
-					console.info("====",res)
 					if(res.data.code=="200"){
 						this.publistNum = res.data.data.mediaCount;
 						this.publist = res.data.data.url;
-						this.mediaId = res.data.data.mediaId;
 						this.lastId = res.data.data.minTime;
 						this.offset = res.data.data.offset;
 					}
@@ -157,7 +154,7 @@
 				this.imgHeight = (e.target.height / e.target.width) * 100; // 高度 = 原始高度 / 原始宽度 * 100
 			},
 			handleClick(index){
-				this.$router.push({ path:"/UserPublist", query:{mediaIdList: this.mediaId, index: index}});
+				this.$router.push({ path:"/UserPublist", query:{index: index}});
 
 				// try{
 				// 	console.info(this.mediaId[index])
