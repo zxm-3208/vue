@@ -16,7 +16,7 @@
 		<!-- 右侧列表 -->
 		<div class="right_warp">
 			<!-- 父组件接收子组件的方法 -->
-			<right-bar @changeCom="showCom" @changeLike="clickLike" :plikeCount="likeCount" :plikeFlag="likeFlag"></right-bar>
+			<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag"  ></right-bar>
 		</div>
 
 	</swiper-slide>   
@@ -244,17 +244,26 @@
 				this.$refs.videos[index+1].stop()
 				this.$refs.videos[index].play()
 				this.mediaindex = this.mediaindex + 1
+				this.getLikeCount()
+				this.getInitLikeFalg()
 			},
 			// 下滑
 			nextVideo(index){
 				this.$refs.videos[index-1].stop()
 				this.$refs.videos[index].play()
 				this.mediaindex = this.mediaindex - 1
+				this.getLikeCount()
+				this.getInitLikeFalg()
 			},
 
 			// 弹出评论框
 			showCom(){
 				this.showComment=true;
+			},
+			async getIndex(){
+				this.mediaindex = this.mediaindex + 1
+				this.getLikeCount()
+				this.getInitLikeFalg()
 			},
 			async clickLike(){
 				try{
@@ -282,6 +291,7 @@
 				this.getInitLikeFalg();
 			},
 			async getLikeCount(){
+				console.info("mediaId:",this.mediaindex)
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_user/likes/getLikeCount',{
 						"userId": this.userId,
@@ -294,7 +304,6 @@
 					})
 					if(res.data.code=="200"){
 						this.likeCount = res.data.data
-						console.info("likeCount:", this.likeCount)
 					}
 					else{
 						this.$toast('获取视频点赞数量失败！')
@@ -320,7 +329,7 @@
 						console.info("FLag:",this.likeFlag)
 					}
 					else{
-						this.$toast('获取视频点赞数量失败！')
+						this.$toast('获取视频是否点赞失败！')
 					}
 				}catch(err){
 					console.error(err);
@@ -367,13 +376,14 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
+					console.info("url:",res)
 					if(res.data.code=="200"){
 						this.lastId = res.data.data.minTime;
 						this.offset = res.data.data.offset;
 						for(var i = 0; i < res.data.data.url.length; i++) {
 							this.dataList.push(res.data.data.url[i]);
 						}
-						this.mediaindex = this.mediaindex + res.data.data.url.length;
+						// this.mediaindex = this.mediaindex + res.data.data.url.length;
 					}
 					else{
 						this.$toast('获取发布视频数据失败！')
@@ -381,8 +391,8 @@
 				}catch(err){
 					console.error(err);
 				}
-				this.getLikeCount();
-				this.getInitLikeFalg();
+				// this.getLikeCount();
+				// this.getInitLikeFalg();
 			},
 			// async initLike(){
 			// 	try{

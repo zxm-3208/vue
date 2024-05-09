@@ -11,18 +11,18 @@
 			<span v-if="plikeFlag==-1" class="iconfont icon-aixin"></span>
 			<span v-if="plikeFlag==1" class="iconfont icon-aixin" id="redAiXin">
 			</span>
-			<p>{{plikeCount}}</p>
+			<p>{{this.plikeCount}}</p>
 		</div>
 		<!-- 评论 -->
 		<!-- 当单击评论和评论图标时，将弹出评论信息 -->
 		<div class="item-icon" @click.stop="showCom($event)">
 			<span class="iconfont icon-pinglun"></span>
-			<p>{{pcommentCount}}</p>
+			<p>{{this.pcommentCount}}</p>
 		</div>
 		<!-- 分享 -->
 		<div class="item-icon">
 			<span class="iconfont icon-fenxiang"></span>
-			<p>{{pforwardCount}}</p>
+			<p>{{this.pforwardCount}}</p>
 		</div>
 
 		<div class="rightBar-item1">
@@ -37,33 +37,11 @@
 		name:"RightBar",
 		data(){
 			return{
-				// likeCount: 0,
-				pcommentCount: 0,
-				pforwardCount: 0,
-				// plikeFlag: -1,
 			}
 		},
-		props:{
-			plikeCount: {
-				type: Number,
-				required: true
-			},
-			// pcommentCount: {
-			// 	type: Number,
-			// 	required: true
-			// },
-			// pforwardCount: {
-			// 	type: Number,
-			// 	required: true
-			// },
-			plikeFlag: {
-				type: Number,
-				required: true
-			},
-		},
+		props: ['pindex', 'plikeCount', 'plikeFlag', 'pforwardCount', 'pcommentCount'],
 		created(){
-			// this.getLikeCount();
-			// this.initlike();
+			this.getIndex();
 		},
 		methods:{
 			showCom(e){
@@ -73,6 +51,9 @@
 			clickLike(){
 				// icon变化
 				this.$emit('changeLike')
+			},
+			getIndex(){
+				this.$emit('changeIndex')
 			}
 		}
 	}
