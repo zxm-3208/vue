@@ -234,6 +234,8 @@
         },
         created(){
 			this.getAllPublistUrl();
+			this.getLikeCount();
+			this.getInitLikeFalg();
 		},
         methods:{
 			playAction(index){
@@ -379,8 +381,8 @@
 				}catch(err){
 					console.error(err);
 				}
-				this.getLikeCount();
-				this.getInitLikeFalg();
+				// this.getLikeCount();
+				// this.getInitLikeFalg();
 			},
 			// async initLike(){
 			// 	try{

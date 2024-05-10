@@ -49,13 +49,6 @@ const router=new Router({
 					path:'/me',
 					name:'me',
 					component:()=>import('./views/me/Me.vue'),
-					// children:[
-					// 	{
-					// 		path:'/UserPublist',
-					// 		name:'/me',
-					// 		component:()=> import('./views/me/VideoList.vue')
-					// 	},
-					// ]
 				},
 				{
 					path:'/msg',
@@ -99,6 +92,12 @@ const router=new Router({
 			path:'/UserPublist',
 			name:'/me',
 			component:()=> import('./views/me/VideoList.vue')
+		},
+		// 用户点赞列表
+		{
+			path:'/UserLikeList',
+			name:'/me',
+			component:()=> import('./views/me/VideoLikeList.vue')
 		}
 		
 	]

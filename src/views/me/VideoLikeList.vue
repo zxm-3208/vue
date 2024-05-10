@@ -174,7 +174,7 @@
 	import RightBar from '../../components/index/RightBar.vue'
 	import Myheader from '../../components/header/Myheader.vue'
 	export default{
-        name:'videoList',
+        name:'videoLikeList',
         components: {
             SwiperSlide,          //定义组件
             Swiper,
@@ -189,7 +189,7 @@
 				offset: 0,
 
 				showComment:false,
-				page:1,
+				page: 1,
                 swiperOption: {
                     direction:"vertical",
                     grabCursor: true, 
@@ -272,6 +272,7 @@
 						"userId": this.userId, 
 						"mediaId": this.mediaIdList[this.mediaindex]
 					})
+					console.info("res:", res)
 				}
 				catch(err){
 					console.error(err);
@@ -280,6 +281,9 @@
 				this.getInitLikeFlag();
 			},
 			async getLikeCount(){
+				console.info("mediaIndex:",this.mediaindex)
+				console.info("userID:", this.userId)
+				console.info("mediaID:", this.mediaIdList[this.mediaindex])
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_user/likes/getLikeCount',{
 						"userId": this.userId,
@@ -313,6 +317,7 @@
 					})
 					if(res.data.code=="200"){
 						this.likeFlag = res.data.data
+						console.info("flag:", this.likeFlag)
 					}
 					else{
 						this.$toast('获取视频是否点赞失败！')
@@ -329,7 +334,7 @@
 				this.lastId = Date.parse(new Date());
 				try{
 					this.userId = localStorage.getItem('userId')
-					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUserUrl',{
+					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUserLikeUrl',{
 						"userId": this.userId,
 						"lastId": this.lastId,
 						"offset": this.offset,
@@ -340,6 +345,7 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
+					console.info(res)
 					if(res.data.code=="200"){
 						this.mediaIdList = res.data.data.mediaId;
 						this.lastId = res.data.data.minTime;

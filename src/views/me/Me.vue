@@ -58,9 +58,7 @@
 					</div>
 					<div class="tab-con" v-show="indexTab==2">
 						<div class="tab-img">
-							<img src="../../../public/images/004.jpg" />
-							<img src="../../../public/images/005.jpg" />
-							<img src="../../../public/images/006.jpg" />
+							<img mode="widthFix" class="img" v-for="(item, index) in likeList" :key="index" :src="item"  @load="onImgLoad" @click="handleClickToLike(index)"/>
 						</div>
 					</div>
 				</div>
@@ -77,6 +75,8 @@
 			return{
 				lastId: 0,
 				offset: 0,
+				LikelastId: 0,
+				Likeoffset: 0,
 
 				bgPic:{
 					backgroundImage:'url('+require('../../../public/images/bg.jpg')+')',
@@ -98,10 +98,20 @@
 		},
 		created(){
 			this.getPublistImg();
+			this.getLikeListImg();
 		},
 		methods:{
 			changeTab(index){
 				this.indexTab=index;
+				if(index==0){
+					this.getPublistImg()
+				}
+				else if(index==1){
+
+				}
+				else if(index==2){
+					this.getLikeListImg()
+				}
 			},
 			toRouter(){
 				this.$router.push('/edit')
@@ -138,12 +148,40 @@
 					if(res.data.code=="200"){
 						this.publistNum = res.data.data.mediaCount;
 						this.publist = res.data.data.url;
-						this.lastId = res.data.data.minTime;
-						this.offset = res.data.data.offset;
+						// this.lastId = res.data.data.minTime;
+						// this.offset = res.data.data.offset;
 					}
 					else{
 						this.$toast('获取发布视频数据失败！')
 
+					}
+				}catch(err){
+					console.error(err);
+				}
+			},
+			async getLikeListImg(){
+				this.LikelastId = Date.parse(new Date());
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_publish/showlist/likeList',{
+						"userId": localStorage.getItem('userId'),
+						"lastId": this.LikelastId,
+						"offset": this.Likeoffset,
+						}
+						,
+						{
+							headers: {
+								'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+							}
+						})
+					console.info("res:",res);
+					if(res.data.code=="200"){
+						this.likeNum = res.data.data.mediaCount;
+						this.likeList = res.data.data.url;
+						// this.LikelastId = res.data.data.minTime;
+						// this.Likeoffset = res.data.data.offset;
+					}
+					else{
+						this.$toast('获取发布视频数据失败！')
 					}
 				}catch(err){
 					console.error(err);
@@ -155,29 +193,9 @@
 			},
 			handleClick(index){
 				this.$router.push({ path:"/UserPublist", query:{index: index}});
-
-				// try{
-				// 	console.info(this.mediaId[index])
-				// 	let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/clickPlay',{
-				// 		"userId": this.userId,
-				// 		"mediaIdList": this.mediaId,
-				// 	}
-				// 	,
-				// 	{
-				// 		headers: {
-				// 			'Authorization': 'Bearer ' + localStorage.getItem('authorization')
-				// 		}
-				// 	})
-				// 	if(res.data.code=="200"){
-				// 		this.$router.push({ path:"/index?mediaIdList="+res.data.data});
-				// 	}
-				// 	else{
-				// 		this.$toast('获取视频数据失败！')
-
-				// 	}
-				// }catch(err){
-				// 	console.error(err);
-				// }
+			},
+			handleClickToLike(index){
+				this.$router.push({ path:"/UserLikeList", query:{index: index}});
 			},
 			hello(){
 				axios.get('http://localhost:8020/douyin_auth/user/hello', {
