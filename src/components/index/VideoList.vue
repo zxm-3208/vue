@@ -271,18 +271,6 @@
 						"userId": this.userId, 
 						"mediaId": this.mediaIdList[this.mediaindex]
 					})
-					if(res.data.code=="200"){
-						if(res.data.code=="200"){
-							console.info("111")
-						}
-						else{
-							this.$toast('点赞失败！')
-
-						}
-					}
-					else{
-						this.$toast('点赞失败！')
-					}
 				}
 				catch(err){
 					console.error(err);
@@ -350,9 +338,10 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
+					console.info("res:", res)
 					if(res.data.code=="200"){
-						this.mediaIdList = res.data.data;
 						// 获取外链
+						this.mediaIdList = res.data.data;
 						this.headleLoadingMedia();
 					}
 					else{
@@ -364,7 +353,6 @@
 			},
 			async headleLoadingMedia(){
 				try{
-
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUrl',{
 						"userId": this.userId,
 						"lastId": this.lastId,
@@ -391,8 +379,8 @@
 				}catch(err){
 					console.error(err);
 				}
-				// this.getLikeCount();
-				// this.getInitLikeFalg();
+				this.getLikeCount();
+				this.getInitLikeFalg();
 			},
 			// async initLike(){
 			// 	try{
