@@ -40,7 +40,7 @@
 			<div class="me-tab">
 				<div class="me-navbar">
 					<div class="item" @click="changeTab(0)" :class="indexTab==0?'active':'' ">作品&nbsp;{{publistNum}}</div>
-					<div class="item" @click="changeTab(1)" :class="indexTab==1?'active':'' ">收藏&nbsp;{{collectNum}}</div>
+					<div class="item" @click="changeTab(1)" :class="indexTab==1?'active':'' ">草稿&nbsp; </div>
 					<div class="item" @click="changeTab(2)" :class="indexTab==2?'active':'' ">喜欢&nbsp;{{likeNum}}</div>
 				</div>
 				<div class="tab-wrap">
@@ -50,11 +50,11 @@
 						</div>
 					</div>
 					<div class="tab-con" v-show="indexTab==1">
-						<div class="tab-img">
-							<img src="../../../public/images/001.jpg" />
-							<img src="../../../public/images/002.jpg" />
-							<img src="../../../public/images/003.jpg" />
-						</div>
+						<!-- <div class="tab-img">
+							<img class="img" src="../../../public/images/001.jpg" />
+							<img class="img" src="../../../public/images/002.jpg" />
+							<img class="img" src="../../../public/images/003.jpg" />
+						</div> -->
 					</div>
 					<div class="tab-con" v-show="indexTab==2">
 						<div class="tab-img">
@@ -134,6 +134,7 @@
 			async getPublistImg(){
 				this.lastId = Date.parse(new Date());
 				try{
+					console.info("publistImg:",localStorage.getItem('userId'), this.lastId, this.offset);
 					let res = await axios.post('http://localhost:8020/douyin_publish/showlist/publist',{
 						"userId": localStorage.getItem('userId'),
 						"lastId": this.lastId,
@@ -145,6 +146,7 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
+					// console.info("publistImg:",res);
 					if(res.data.code=="200"){
 						this.publistNum = res.data.data.mediaCount;
 						this.publist = res.data.data.url;

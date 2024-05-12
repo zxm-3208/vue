@@ -16,7 +16,7 @@
 		<!-- 右侧列表 -->
 		<div class="right_warp">
 			<!-- 父组件接收子组件的方法 -->
-			<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag"  ></right-bar>
+			<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" @changeFollow="changeFollow" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag" :pfollowFlag="isFollow" ></right-bar>
 		</div>
 
 	</swiper-slide>   
@@ -229,15 +229,74 @@
 				commentCount: 0,
 				forwardCount: 0,
 				likeFlag: -1,
+				authorIdList: [],
+				titleList: [],
+				isFollow: [],
             }
             
         },
         created(){
 			this.getAllPublistUrl();
-			this.getLikeCount();
-			this.getInitLikeFalg();
+			// this.getLikeCount();
+			// this.getInitLikeFalg();
 		},
         methods:{
+			async getAllPublistUrl(){
+				this.lastId = Date.parse(new Date());
+				try{
+					this.userId = localStorage.getItem('userId');
+					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getAllPublist',{
+					},
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+					if(res.data.code=="200"){
+						// 获取外链
+						this.mediaIdList = res.data.data;
+						this.headleLoadingMedia();
+					}
+					else{
+						this.$toast('获取发布视频数据失败！')
+					}
+				}catch(err){
+					console.error(err);
+				}
+			},
+			async headleLoadingMedia(){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUrl',{
+						"userId": this.userId,
+						"lastId": this.lastId,
+						"offset": this.offset,
+					}
+					,
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+					console.info(res)
+					if(res.data.code=="200"){
+						this.titleList = res.data.data.mediaTitle;
+						this.lastId = res.data.data.minTime;
+						this.offset = res.data.data.offset;
+						for(var i = 0; i < res.data.data.url.length; i++) {
+							this.dataList.push(res.data.data.url[i]);
+							this.authorIdList.push(res.data.data.userId[res.data.data.url.length - 1 - i])
+						}
+						// this.mediaindex = this.mediaindex + res.data.data.url.length;
+					}
+					else{
+						this.$toast('获取发布视频数据失败！')
+					}
+				}catch(err){
+					console.error(err);
+				}
+				// this.getLikeCount();
+				// this.getInitLikeFalg();
+			},
 			playAction(index){
 				this.$refs.videos[index].playOrStop()
 			},
@@ -248,6 +307,7 @@
 				this.mediaindex = this.mediaindex + 1
 				this.getLikeCount()
 				this.getInitLikeFalg()
+				this.getInitFollow(this.mediaindex);
 			},
 			// 下滑
 			nextVideo(index){
@@ -256,16 +316,17 @@
 				this.mediaindex = this.mediaindex - 1
 				this.getLikeCount()
 				this.getInitLikeFalg()
+				this.getInitFollow(this.mediaindex);
 			},
-
 			// 弹出评论框
 			showCom(){
 				this.showComment=true;
 			},
-			async getIndex(){
+			getIndex(){
 				this.mediaindex = this.mediaindex + 1
 				this.getLikeCount()
 				this.getInitLikeFalg()
+				this.getInitFollow();
 			},
 			async clickLike(){
 				try{
@@ -281,7 +342,6 @@
 				this.getInitLikeFalg();
 			},
 			async getLikeCount(){
-				console.info("mediaId:",this.mediaindex)
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_user/likes/getLikeCount',{
 						"userId": this.userId,
@@ -313,10 +373,8 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
-					console.info(res)
 					if(res.data.code=="200"){
 						this.likeFlag = res.data.data
-						console.info("FLag:",this.likeFlag)
 					}
 					else{
 						this.$toast('获取视频是否点赞失败！')
@@ -325,88 +383,39 @@
 					console.error(err);
 				}
 			},
+			async changeFollow(){
+				console.info("change:", this.userId, this.authorIdList[this.mediaindex], this.isFollow )
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/follow/authorFollow',{
+						"userId": this.userId, 
+						"authorId": this.authorIdList[this.mediaindex],
+						"isFollow": this.isFollow,
+					})
+					console.info("changeFollow:",res);
+				}
+				catch(err){
+					console.error(err);
+				}
+				this.getInitFollow();
+			},
+			async getInitFollow(){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/follow/isFollow',{
+						"userId": this.userId, 
+						"authorId": this.authorIdList[this.mediaindex],
+					})
+					if(res.data.code=="200"){
+						this.isFollow = res.data.data
+					}
+				}
+				catch(err){
+					console.error(err);
+				}
+			},
 			// 关闭评论框
 			close(){
 				this.showComment=false;
 			},
-			async getAllPublistUrl(){
-				this.lastId = Date.parse(new Date());
-				try{
-					this.userId = localStorage.getItem('userId');
-					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getAllPublist',{
-					},
-					{
-						headers: {
-							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
-						}
-					})
-					console.info("res:", res)
-					if(res.data.code=="200"){
-						// 获取外链
-						this.mediaIdList = res.data.data;
-						this.headleLoadingMedia();
-					}
-					else{
-						this.$toast('获取发布视频数据失败！')
-					}
-				}catch(err){
-					console.error(err);
-				}
-			},
-			async headleLoadingMedia(){
-				try{
-					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUrl',{
-						"userId": this.userId,
-						"lastId": this.lastId,
-						"offset": this.offset,
-					}
-					,
-					{
-						headers: {
-							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
-						}
-					})
-					console.info("url:",res)
-					if(res.data.code=="200"){
-						this.lastId = res.data.data.minTime;
-						this.offset = res.data.data.offset;
-						for(var i = 0; i < res.data.data.url.length; i++) {
-							this.dataList.push(res.data.data.url[i]);
-						}
-						// this.mediaindex = this.mediaindex + res.data.data.url.length;
-					}
-					else{
-						this.$toast('获取发布视频数据失败！')
-					}
-				}catch(err){
-					console.error(err);
-				}
-				// this.getLikeCount();
-				// this.getInitLikeFalg();
-			},
-			// async initLike(){
-			// 	try{
-			// 		let res = await axios.post('http://localhost:8020/douyin_user/likes/initLike',{
-			// 			"userId": this.userId, 
-			// 			"mediaId": this.mediaIdList[this.mediaindex]
-			// 		})
-			// 		if(res.data.code=="200"){
-			// 			console.info(res)
-			// 			if(res.data.code=="200"){
-			// 				this.likeFlag = res.data.data
-			// 			}
-			// 			else{
-			// 				this.$toast('初始化点赞失败！')
-
-			// 			}
-			// 		}
-			// 		else{
-			// 			this.$toast('初始化点赞失败！')
-			// 		}
-			// 	}catch(err){
-			// 		console.error(err);
-			// 	}
-			// },
 			
 		}
 		

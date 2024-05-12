@@ -17,7 +17,7 @@
 				<!-- 右侧列表 -->
 				<div class="right_warp">
 					<!-- 父组件接收子组件的方法 -->
-					<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag"  ></right-bar>
+					<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" @changeFollow="changeFollow" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag"  ></right-bar>
 				</div>
 			</swiper-slide>   
 		</swiper>
@@ -279,6 +279,9 @@
 				}
 				this.getLikeCount();
 				this.getInitLikeFlag();
+			},
+			async changeFollow(){
+				// TODO: 先要获取视频作者ID，头像等信息，然后
 			},
 			async getLikeCount(){
 				console.info("mediaIndex:",this.mediaindex)

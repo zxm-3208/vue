@@ -25,12 +25,12 @@ const router=new Router({
 					children:[
 						{
 							path:'/guanzhu',
-							name:'index',
+							name:'guanzhu',
 							component:()=>import('./components/index/VideoList.vue'),
 						},
 						{
 							path:'/tuijian',
-							name:'index',
+							name:'tuijian',
 							component:()=>import('./components/index/VideoList.vue'),
 						}
 					]
@@ -90,13 +90,13 @@ const router=new Router({
 		// 用户作品列表
 		{
 			path:'/UserPublist',
-			name:'/me',
+			name:'/UserPublist',
 			component:()=> import('./views/me/VideoList.vue')
 		},
 		// 用户点赞列表
 		{
 			path:'/UserLikeList',
-			name:'/me',
+			name:'/UserLikeList',
 			component:()=> import('./views/me/VideoLikeList.vue')
 		}
 		

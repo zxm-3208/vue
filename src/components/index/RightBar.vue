@@ -3,7 +3,11 @@
 		<div class="rightBar-item">
 			<div class="avatar-border">
 				<img src="../../../public/images/head.jpg" alt="">
-				<span class="iconfont icon-wuuiconxiangjifangda"></span>
+					
+					<span v-if="pfollowFlag==-1" @click="follow"></span>
+					<span v-if="pfollowFlag==0" @click="follow" class="iconfont icon-wuuiconxiangjifangda"></span>
+					<span v-if="pfollowFlag==1" @click="follow" class="iconfont icon-jian"></span>	
+					
 			</div>
 		</div>
 		<!-- 点赞 -->
@@ -39,7 +43,7 @@
 			return{
 			}
 		},
-		props: ['pindex', 'plikeCount', 'plikeFlag', 'pforwardCount', 'pcommentCount'],
+		props: ['pindex', 'plikeCount', 'plikeFlag', 'pforwardCount', 'pcommentCount', 'pfollowFlag'],
 		created(){
 			this.getIndex();
 		},
@@ -54,6 +58,9 @@
 			},
 			getIndex(){
 				this.$emit('changeIndex')
+			},
+			follow(){
+				this.$emit('changeFollow')
 			}
 		}
 	}
@@ -124,6 +131,13 @@
 	}
 	#redAiXin{
 		color: #ff0000;
+	}
+	.avatar-border .icon-jian{
+		color:#FE2C5A;
+		position: absolute;
+		top:40px;
+		left:0;
+		right:0;
 	}
 	
 	@keyframes round{
