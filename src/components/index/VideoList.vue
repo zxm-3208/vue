@@ -342,6 +342,7 @@
 				this.getInitLikeFalg();
 			},
 			async getLikeCount(){
+				console.info(this.mediaindex)
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_user/likes/getLikeCount',{
 						"userId": this.userId,

@@ -29,9 +29,9 @@
 					<span>+添加学校等标签</span>
 				</div>
 				<div class="user-tag2">
-					<span><a>666</a>获赞</span>
-					<span><a>6</a>关注</span>
-					<span><a>66</a>粉丝</span>
+					<!-- <span><a>0</a>获赞</span> -->
+					<span><a>{{this.followCount}}</a>关注</span>
+					<span><a>{{this.fansCount}}</a>粉丝</span>
 				</div>
 				<div class="me-ab">
 					好好学习天天向上
@@ -94,11 +94,16 @@
 
 				likeList: [],
 				likeNum: 0,
+
+				followCount: 0,
+				fansCount: 0,
 			}
 		},
 		created(){
 			this.getPublistImg();
 			this.getLikeListImg();
+			this.initFollowCount();
+			this.initFansCount();
 		},
 		methods:{
 			changeTab(index){
@@ -181,6 +186,48 @@
 						this.likeList = res.data.data.url;
 						// this.LikelastId = res.data.data.minTime;
 						// this.Likeoffset = res.data.data.offset;
+					}
+					else{
+						this.$toast('获取发布视频数据失败！')
+					}
+				}catch(err){
+					console.error(err);
+				}
+			},
+			async initFollowCount(){
+				this.LikelastId = Date.parse(new Date());
+				try{
+					var userId = localStorage.getItem('userId')
+					let res = await axios.get('http://localhost:8020/douyin_user/follow/getFollowCount?userId='+userId,
+						{
+							headers: {
+								'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+							}
+						})
+					console.info("follow:",res);
+					if(res.data.code=="200"){
+						this.followCount = res.data.data
+					}
+					else{
+						this.$toast('获取发布视频数据失败！')
+					}
+				}catch(err){
+					console.error(err);
+				}
+			},
+			async initFansCount(){
+				this.LikelastId = Date.parse(new Date());
+				try{
+					var userId = localStorage.getItem('userId')
+					let res = await axios.get('http://localhost:8020/douyin_user/follow/getFansCount?userId='+userId,
+						{
+							headers: {
+								'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+							}
+						})
+					console.info("fans:",res);
+					if(res.data.code=="200"){
+						this.fansCount = res.data.data
 					}
 					else{
 						this.$toast('获取发布视频数据失败！')
