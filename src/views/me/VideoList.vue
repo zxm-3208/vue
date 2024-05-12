@@ -17,7 +17,7 @@
 				<!-- 右侧列表 -->
 				<div class="right_warp">
 					<!-- 父组件接收子组件的方法 -->
-					<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag"  ></right-bar>
+					<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" @changeFollow="changeFollow" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag" :pfollowFlag="isFollow" ></right-bar>
 				</div>
 			</swiper-slide>   
 		</swiper>
@@ -227,6 +227,9 @@
 				commentCount: 0,
 				forwardCount: 0,
 				likeFlag: -1,
+				authorIdList: [],
+				titleList: [],
+				isFollow: [],
             }
             
         },
@@ -245,6 +248,7 @@
 				this.mediaindex = this.mediaindex - 1
 				this.getLikeCount()
 				this.getInitLikeFlag()
+				this.getInitFollow();
 				this.$refs.videos[index+1].stop()
 				this.$refs.videos[index].play()
 			},
@@ -253,6 +257,7 @@
 				this.mediaindex = this.mediaindex + 1
 				this.getLikeCount()
 				this.getInitLikeFlag()
+				this.getInitFollow();
 				this.$refs.videos[index-1].stop()
 				this.$refs.videos[index].play()
 			},
@@ -265,6 +270,7 @@
 				// this.mediaindex = this.mediaindex + 1
 				this.getLikeCount()
 				this.getInitLikeFlag()
+				this.getInitFollow();
 			},
 			async clickLike(){
 				try{
@@ -321,6 +327,35 @@
 					console.error(err);
 				}
 			},
+			async changeFollow(){
+				console.info("change:", this.userId, this.authorIdList[this.mediaindex], this.isFollow )
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/follow/authorFollow',{
+						"userId": this.userId, 
+						"authorId": this.authorIdList[this.mediaindex],
+						"isFollow": this.isFollow,
+					})
+					console.info("changeFollow:",res);
+				}
+				catch(err){
+					console.error(err);
+				}
+				this.getInitFollow();
+			},
+			async getInitFollow(){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/follow/isFollow',{
+						"userId": this.userId, 
+						"authorId": this.authorIdList[this.mediaindex],
+					})
+					if(res.data.code=="200"){
+						this.isFollow = res.data.data
+					}
+				}
+				catch(err){
+					console.error(err);
+				}
+			},
 			// 关闭评论框
 			close(){
 				this.showComment=false;
@@ -342,10 +377,12 @@
 					})
 					if(res.data.code=="200"){
 						this.mediaIdList = res.data.data.mediaId;
+						this.titleList = res.data.data.mediaTitle;
 						this.lastId = res.data.data.minTime;
 						this.offset = res.data.data.offset;
 						for(var i = 0; i < res.data.data.url.length; i++) {
 							this.dataList.push(res.data.data.url[i]);
+							this.authorIdList.push(res.data.data.userId[res.data.data.url.length - 1 - i])
 						}
 					}
 					else{

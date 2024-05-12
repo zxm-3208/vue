@@ -307,7 +307,7 @@
 				this.mediaindex = this.mediaindex + 1
 				this.getLikeCount()
 				this.getInitLikeFalg()
-				this.getInitFollow(this.mediaindex);
+				this.getInitFollow();
 			},
 			// 下滑
 			nextVideo(index){
@@ -316,7 +316,7 @@
 				this.mediaindex = this.mediaindex - 1
 				this.getLikeCount()
 				this.getInitLikeFalg()
-				this.getInitFollow(this.mediaindex);
+				this.getInitFollow();
 			},
 			// 弹出评论框
 			showCom(){
