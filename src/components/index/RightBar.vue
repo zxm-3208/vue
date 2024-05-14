@@ -2,8 +2,7 @@
 	<div class="rightBar">
 		<div class="rightBar-item">
 			<div class="avatar-border">
-				<img src="../../../public/images/head.jpg" alt="">
-					
+				<img :src="iconUrl" alt="">
 					<span v-if="pfollowFlag==-1" @click="follow"></span>
 					<span v-if="pfollowFlag==0" @click="follow" class="iconfont icon-wuuiconxiangjifangda"></span>
 					<span v-if="pfollowFlag==1" @click="follow" class="iconfont icon-jian"></span>	
@@ -43,7 +42,7 @@
 			return{
 			}
 		},
-		props: ['pindex', 'plikeCount', 'plikeFlag', 'pforwardCount', 'pcommentCount', 'pfollowFlag'],
+		props: ['pindex', 'plikeCount', 'plikeFlag', 'pforwardCount', 'pcommentCount', 'pfollowFlag', 'iconUrl'],
 		created(){
 			this.getIndex();
 		},

@@ -1,7 +1,7 @@
 <template>
 	<div class="info-bar">
-		<div class="infobar-item"><span>@憨蛋儿</span></div>
-		<div class="infobar-item"><span>可爱至极</span></div>
+		<div class="infobar-item"><span>{{ editName }}</span></div>
+		<div class="infobar-item"><span>{{ title }}</span></div>
 		<div class="infobar-item music-item">
 			<span class="iconfont icon-icon-test"></span>
 			<div  class="music-name">
@@ -11,6 +11,9 @@
 	</div>
 </template>
 <script>
+	export default{
+		props: ['editName', 'title'],
+	}
 </script>
 <style scoped>
 	.info-bar{

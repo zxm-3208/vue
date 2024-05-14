@@ -11,13 +11,13 @@
 
 				<!-- 底部说明 -->
 				<div class="infobar_warp">
-					<info-bar></info-bar>
+					<info-bar :editName="editNameList[mediaindex]" :title="titleList[mediaindex]"></info-bar>
 				</div>
 
 				<!-- 右侧列表 -->
 				<div class="right_warp">
 					<!-- 父组件接收子组件的方法 -->
-					<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" @changeFollow="changeFollow" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag" :pfollowFlag="isFollow"  ></right-bar>
+					<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" @changeFollow="changeFollow" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag" :pfollowFlag="isFollow" :iconUrl="iconUrl"  ></right-bar>
 				</div>
 			</swiper-slide>   
 		</swiper>
@@ -230,6 +230,10 @@
 				authorIdList: [],
 				titleList: [],
 				isFollow: [],
+
+				iconUrl: '',
+				editNameList: [],
+				iconUrlList: [],
             }
             
         },
@@ -249,6 +253,7 @@
 				this.getLikeCount()
 				this.getInitLikeFlag()
 				this.getInitFollow();
+				this.getInitInf();
 				this.$refs.videos[index+1].stop()
 				this.$refs.videos[index].play()
 			},
@@ -258,6 +263,7 @@
 				this.getLikeCount()
 				this.getInitLikeFlag()
 				this.getInitFollow();
+				this.getInitInf();
 				this.$refs.videos[index-1].stop()
 				this.$refs.videos[index].play()
 			},
@@ -271,6 +277,7 @@
 				this.getLikeCount()
 				this.getInitLikeFlag()
 				this.getInitFollow();
+				this.getInitInf();
 			},
 			async clickLike(){
 				try{
@@ -361,6 +368,33 @@
 					console.error(err);
 				}
 			},
+			async getInitInf(){	// 获取初始信息
+				try{
+					this.userId = localStorage.getItem('userId');
+					let res = await axios.get('http://localhost:8020/douyin_user/edit/getAttribute?userId='+this.authorIdList[this.mediaindex],
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+					console.info("edit:",res);
+					if(res.data.code=="200"){
+						this.icon = res.data.data.icon;
+						// this.editName = res.data.data.editName;
+						// this.authorId = res.data.data.userId;
+						if(this.icon!=null && this.icon!=''){
+							this.iconUrl = this.icon
+						}else{
+							this.iconUrl = 'https://p.qqan.com/up/2018-3/15217745038903395.jpg'
+						}
+					}
+					else{
+						this.$toast('获取初始化信息失败！')
+					}
+				}catch(err){
+					console.error(err);
+				}
+			},
 			// 关闭评论框
 			close(){
 				this.showComment=false;
@@ -389,6 +423,8 @@
 						for(var i = 0; i < res.data.data.url.length; i++) {
 							this.dataList.push(res.data.data.url[i]);
 							this.authorIdList.push(res.data.data.userId[res.data.data.url.length - 1 - i])
+							this.editNameList.push(res.data.data.userName[i]);
+							// this.iconUrlList.push(res.data.data.userIconList[i]);
 						}
 					}
 					else{
