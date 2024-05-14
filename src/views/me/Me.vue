@@ -5,7 +5,6 @@
 				<button class="exit_icon" @click="loginout">
 					<i class="iconfont icon-logout"></i>
 				</button>
-				
 				<button class="hello" @click="hello">
 					hello
 				</button>
@@ -14,27 +13,27 @@
 		<div class="me-warp">
 			<div class="me-content">
 				<div class="info">
-					<img src="../../../public/images/head.jpg"/>
+					<img  :src="iconUrl" alt="">
 					<button class="btn" @click="toRouter">编辑资料</button>
 					<button class="btn">+朋友</button>
 				</div>
 				<div class="des">
-					<h2>爱学习的孩子</h2>
-					<span>抖音号：123456</span>
-					<p>每个人都有一定的理想，这种理想决定着他的努力和判断的方向。</p>
+					<h2>{{editName}}</h2>
+					<span>抖音号：{{ userId }}</span>
+					<p>{{ editIntro }}</p>
 				</div>
 				<div class="user-tag">
 					<span>26岁</span>
 					<span>北京 朝阳</span>
-					<span>+添加学校等标签</span>
+					<span @click="todo">+添加学校等标签</span>
 				</div>
 				<div class="user-tag2">
 					<!-- <span><a>0</a>获赞</span> -->
-					<span><a>{{this.followCount}}</a>关注</span>
-					<span><a>{{this.fansCount}}</a>粉丝</span>
+					<span><a @click="toFollow()">{{this.followCount}}</a>关注</span>
+					<span><a @click="toFans()">{{this.fansCount}}</a>粉丝</span>
 				</div>
-				<div class="me-ab">
-					好好学习天天向上
+				<div class="me-ab" @click="todo">
+					关注
 				</div>
 			</div>
 			<div class="me-tab">
@@ -97,6 +96,11 @@
 
 				followCount: 0,
 				fansCount: 0,
+
+				iconUrl: '',
+				editName: "姓名",
+				userId: "1111",
+				editIntro: "简介",
 			}
 		},
 		created(){
@@ -104,6 +108,7 @@
 			this.getLikeListImg();
 			this.initFollowCount();
 			this.initFansCount();
+			this.getInitInf();
 		},
 		methods:{
 			changeTab(index){
@@ -120,6 +125,12 @@
 			},
 			toRouter(){
 				this.$router.push('/edit')
+			},
+			toFollow(){
+				this.$router.push('/UserFollowList')
+			},
+			toFans(){
+				this.$router.push('/UserFansList')
 			},
 			loginout(){
 				axios.get('http://localhost:8020/douyin_auth/logout', {
@@ -236,6 +247,50 @@
 					console.error(err);
 				}
 			},
+			async getInitFollow(){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/follow/isFollow',{
+						"userId": this.userId, 
+						"authorId": this.authorIdList[this.mediaindex],
+					})
+					if(res.data.code=="200"){
+						this.isFollow = res.data.data
+					}
+				}
+				catch(err){
+					console.error(err);
+				}
+			},
+			async getInitInf(){	// 获取初始信息
+				try{
+					this.userId = localStorage.getItem('userId');
+					let res = await axios.get('http://localhost:8020/douyin_user/edit/getAttribute?userId='+this.userId,
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+					console.info("edit:",res);
+					if(res.data.code=="200"){
+						this.icon = res.data.data.icon;
+						this.editName = res.data.data.editName;
+						this.userId = res.data.data.userId;
+						this.editIntro = res.data.data.editIntro;
+						// this.gender = res.data.data.gender;
+						// this.birthday = this.formatDate(new Date(res.data.data.birthday*1));
+						if(this.icon!=null && this.icon!=''){
+							this.iconUrl = this.icon
+						}else{
+							this.iconUrl = 'https://p.qqan.com/up/2018-3/15217745038903395.jpg'
+						}
+					}
+					else{
+						this.$toast('获取初始化信息失败！')
+					}
+				}catch(err){
+					console.error(err);
+				}
+			},
 			onImgLoad(e) {
 				// 当图片加载完成后，获取图片的原始宽度和高度，并根据宽度计算出高度
 				this.imgHeight = (e.target.height / e.target.width) * 100; // 高度 = 原始高度 / 原始宽度 * 100
@@ -245,6 +300,9 @@
 			},
 			handleClickToLike(index){
 				this.$router.push({ path:"/UserLikeList", query:{index: index}});
+			},
+			todo(){
+				this.$toast('该功能暂未实现！')
 			},
 			hello(){
 				axios.get('http://localhost:8020/douyin_auth/user/hello', {

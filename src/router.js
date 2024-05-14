@@ -98,8 +98,19 @@ const router=new Router({
 			path:'/UserLikeList',
 			name:'/UserLikeList',
 			component:()=> import('./views/me/VideoLikeList.vue')
-		}
-		
+		},
+		// 用户关注列表
+		{
+			path:'/UserFollowList',
+			name:'/UserFollowList',
+			component:()=> import('./views/me/UserFollowList.vue')
+		},
+		// 用户粉丝列表
+		{
+			path:'/UserFansList',
+			name:'/UserFansList',
+			component:()=> import('./views/me/UserFansList.vue')
+		},
 	]
 });
 
