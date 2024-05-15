@@ -17,7 +17,7 @@
 				<!-- 右侧列表 -->
 				<div class="right_warp">
 					<!-- 父组件接收子组件的方法 -->
-					<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" @changeFollow="changeFollow" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag" :pfollowFlag="isFollow" :iconUrl="iconUrl" ></right-bar>
+					<right-bar @changeCom="showCom" @changeLike="clickLike" @changeFollow="changeFollow" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag" :pfollowFlag="isFollow" :iconUrl="iconUrl" ></right-bar>
 				</div>
 			</swiper-slide>   
 		</swiper>
@@ -238,6 +238,7 @@
         },
         created(){
 			this.getPublistUrl();
+			this.getIndex();
 		},
         methods:{
 			toBack(){
@@ -364,6 +365,7 @@
 			},
 			async getInitInf(){	// 获取初始信息
 				try{
+					console.info("userId:", this.mediaindex, this.authorIdList[this.mediaindex])
 					this.userId = localStorage.getItem('userId');
 					let res = await axios.get('http://localhost:8020/douyin_user/edit/getAttribute?userId='+this.authorIdList[this.mediaindex],
 					{
@@ -415,7 +417,7 @@
 						this.offset = res.data.data.offset;
 						for(var i = 0; i < res.data.data.url.length; i++) {
 							this.dataList.push(res.data.data.url[i]);
-							this.authorIdList.push(res.data.data.userId[res.data.data.url.length - 1 - i])
+							this.authorIdList.push(res.data.data.userId[i])
 							this.editNameList.push(res.data.data.userName[i]);
 						}
 					}

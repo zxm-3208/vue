@@ -10,13 +10,13 @@
 
 		<!-- 底部说明 -->
 		<div class="infobar_warp">
-			<info-bar :editName="editNameList[editNameList.length -1 -mediaindex]" :title="titleList[titleList.length -1 - mediaindex]"></info-bar>
+			<info-bar :editName="editNameList[mediaindex]" :title="titleList[mediaindex]"></info-bar>
 		</div>
 
 		<!-- 右侧列表 -->
 		<div class="right_warp">
 			<!-- 父组件接收子组件的方法 -->
-			<right-bar @changeCom="showCom" @changeLike="clickLike" @changeIndex="getIndex" @changeFollow="changeFollow" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag" :pfollowFlag="isFollow" :iconUrl="iconUrl" ></right-bar>
+			<right-bar @changeCom="showCom" @changeLike="clickLike"  @changeFollow="changeFollow" :plikeCount="likeCount" :pforwardCount="forwardCount" :pcommentCount="commentCount" :plikeFlag="likeFlag" :pfollowFlag="isFollow" :iconUrl="iconUrl" ></right-bar>
 		</div>
 
 	</swiper-slide>   
@@ -240,6 +240,7 @@
         },
         created(){
 			this.getAllPublistUrl();
+			this.getIndex();
 			// this.getLikeCount();
 			// this.getInitLikeFalg();
 		},
@@ -257,7 +258,7 @@
 					})
 					if(res.data.code=="200"){
 						// 获取外链
-						this.mediaIdList = res.data.data;
+						// this.mediaIdList = res.data.data;
 						this.headleLoadingMedia();
 					}
 					else{
@@ -282,12 +283,13 @@
 					})
 					console.info(res)
 					if(res.data.code=="200"){
+						this.mediaIdList = res.data.data.mediaId;
 						this.titleList = res.data.data.mediaTitle;
 						this.lastId = res.data.data.minTime;
 						this.offset = res.data.data.offset;
 						for(var i = 0; i < res.data.data.url.length; i++) {
 							this.dataList.push(res.data.data.url[i]);
-							this.authorIdList.push(res.data.data.userId[res.data.data.url.length - 1 - i])
+							this.authorIdList.push(res.data.data.userId[i])
 							this.titleList.push(res.data.data.mediaTitle[i]);
 							this.editNameList.push(res.data.data.userName[i]);
 						}
@@ -309,7 +311,7 @@
 			preVideo(index){
 				this.$refs.videos[index+1].stop()
 				this.$refs.videos[index].play()
-				this.mediaindex = this.mediaindex + 1
+				this.mediaindex = this.mediaindex - 1
 				this.getLikeCount()
 				this.getInitLikeFalg()
 				this.getInitFollow();
@@ -319,7 +321,7 @@
 			nextVideo(index){
 				this.$refs.videos[index-1].stop()
 				this.$refs.videos[index].play()
-				this.mediaindex = this.mediaindex - 1
+				this.mediaindex = this.mediaindex + 1
 				this.getLikeCount()
 				this.getInitLikeFalg()
 				this.getInitFollow();
@@ -422,6 +424,7 @@
 			},
 			async getInitInf(){	// 获取初始信息
 				try{
+					console.info("authorId:",this.mediaindex,this.mediaIdList[this.mediaindex] );
 					let res = await axios.get('http://localhost:8020/douyin_user/edit/getAttribute?userId='+this.authorIdList[this.mediaindex],
 					{
 						headers: {
