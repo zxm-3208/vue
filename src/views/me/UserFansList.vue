@@ -3,72 +3,21 @@
 		<div class="msg-warp">
 			<div>
 				<div>
-					<myheader @changeBack="toBack" class="header" title="粉丝列表" hasLeft="true" rightTxt="false" ></myheader>
+					<myheader @changeBack="toBack" class="header" title="粉丝列表" hasLeft="true" rightTxt="false"></myheader>
 				</div>
 				<!-- 消息列表 -->
 				<div class="msg-list-box">
-					<div class="msg-list">
-						<img src="../../../public/images/head2.jpg" alt="">
+					<div class="msg-list" v-for="(item,index) in userIdList" :key="index">
+						<img :src="iconList[index]" alt="">
 						<div class="user-des">
 							<div class="top">
-								<span>抖音小助手</span>
-								<span>12：20</span>
+								<span>{{nameList[index]}}</span>
+								<span v-if="flag" ></span>
+								<span v-if="followFlagList[index]=='1'"  @click="handleFollow(index)" >已关注</span>
+								<span v-if="followFlagList[index]=='0'" @click="handleFollow(index)" >回关</span>
 							</div>
 							<div class="top top-msg">
-								<span>抖音安全课堂</span>
-								<span class="no-see"></span>
-							</div>
-						</div>
-					</div>
-					<div class="msg-list">
-						<img src="../../../public/images/head1.jpg" alt="">
-						<div class="user-des">
-							<div class="top">
-								<span>抖音小助手</span>
-								<span>2：20</span>
-							</div>
-							<div class="top top-msg">
-								<span>在干嘛？</span>
-								<span class="no-see"></span>
-							</div>
-						</div>
-					</div>
-					<div class="msg-list">
-						<img src="../../../public/images/head1.jpg" alt="">
-						<div class="user-des">
-							<div class="top">
-								<span>路人甲</span>
-								<span>2：22</span>
-							</div>
-							<div class="top top-msg">
-								<span>在干嘛？</span>
-								<span class="no-see"></span>
-							</div>
-						</div>
-					</div>
-					<div class="msg-list">
-						<img src="../../../public/images/head1.jpg" alt="">
-						<div class="user-des">
-							<div class="top">
-								<span>路人甲</span>
-								<span>2：22</span>
-							</div>
-							<div class="top top-msg">
-								<span>在干嘛？</span>
-								<span class="no-see"></span>
-							</div>
-						</div>
-					</div>
-					<div class="msg-list">
-						<img src="../../../public/images/head1.jpg" alt="">
-						<div class="user-des">
-							<div class="top">
-								<span>路人甲</span>
-								<span>2：22</span>
-							</div>
-							<div class="top top-msg">
-								<span>在干嘛？</span>
-								<span class="no-see"></span>
+								<span>{{introductionList[index]}}</span>
 							</div>
 						</div>
 					</div>
@@ -79,15 +28,99 @@
 </template>
 <script>
 	import Myheader from '../../components/header/Myheader.vue'
+	import axios from 'axios'
 	export default{
+		data(){
+			return {
+				iconUrl: '',
+
+				lastId: 0,
+				offset: 0,
+
+				userId: '',
+				iconList: [],
+				nameList: [],
+				introductionList: [],
+
+				userIdList: [],
+				followFlagList: [],
+				flag: 0,
+			}
+		},
 		name:"",
 		components:{
 			Myheader
+		},
+		created(){
+			this.initFans();
 		},
 		methods:{
 			toBack(){
 				this.$router.push('/me')
 			},	
+			async initFans(){
+				this.userId = localStorage.getItem('userId');
+				this.lastId = Date.parse(new Date());
+				let res = await axios.post('http://localhost:8020/douyin_user/fansList/getFansList',{
+					"userId": this.userId,
+					"lastId": this.lastId,
+					"offset": this.offset,
+				},
+				{
+					headers: {
+						'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+					}
+				})
+				console.info("fansList:",res);
+				if(res.data.code=="200"){
+					this.userIdList = res.data.data.userIdList
+					this.iconList = res.data.data.iconList
+					this.nameList = res.data.data.nameList
+					this.introductionList = res.data.data.introductionList
+					this.followFlagList = res.data.data.followFlagList
+					
+					console.info("id:", this.userIdList)
+					console.info(this.iconList)
+					console.info(this.nameList)
+					console.info(this.introductionList)
+					
+
+					for(var i = 0; i < this.userIdList.length; i++){
+						if(this.iconList[i]==null || this.iconList[i]==''){
+							this.iconList[i] = 'https://p.qqan.com/up/2018-3/15217745038903395.jpg'
+						}
+					}
+					console.info(this.followFlagList)
+					console.info(this.iconList)
+				}
+				else{
+					this.$toast('获取初始化信息失败！')
+				}
+			},
+
+			async handleFollow(index){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/follow/authorFollow',{
+						"userId": this.userId, 
+						"authorId": this.userIdList[index],
+						"isFollow": this.followFlagList[index],
+					})
+					if(res.data.code == "200"){
+						if(this.followFlagList[index]=='1'){
+							this.followFlagList[index] = '0'
+							this.flag = '1'
+						}
+						else if(this.followFlagList[index]=='0'){
+							this.followFlagList[index] = '1'
+							this.flag = '0'
+						}
+					}
+				}
+				catch(err){
+					console.error(err);
+				}
+			},
+
 		}
 	}
 </script>

@@ -12,8 +12,9 @@
 						<div class="user-des">
 							<div class="top">
 								<span>{{nameList[index]}}</span>
-								<span v-if="followFlag==1"  @click="handleFollow" >已关注</span>
-								<span v-if="followFlag==0" @click="handleFollow" >关注</span>
+								<span v-if="flag" ></span>
+								<span v-if="followFlagList[index]=='1'"  @click="handleFollow(index)" >已关注</span>
+								<span v-if="followFlagList[index]=='0'" @click="handleFollow(index)" >关注</span>
 							</div>
 							<div class="top top-msg">
 								<span>{{introductionList[index]}}</span>
@@ -36,12 +37,14 @@
 				lastId: 0,
 				offset: 0,
 
+				userId: '',
 				userIdList: [],
 				iconList: [],
 				nameList: [],
 				introductionList: [],
 
-				followFlag: 1,
+				followFlagList: [],
+				flag: 0,
 			}
 		},
 		name:"",
@@ -74,14 +77,11 @@
 					this.iconList = res.data.data.iconList
 					this.nameList = res.data.data.nameList
 					this.introductionList = res.data.data.introductionList
-					console.info(this.userIdList)
-					console.info(this.iconList)
-					console.info(this.nameList)
-					console.info(this.introductionList)
 					for(var i = 0; i < this.userIdList.length; i++){
 						if(this.iconList[i]==null || this.iconList[i]==''){
 							this.iconList[i] = 'https://p.qqan.com/up/2018-3/15217745038903395.jpg'
 						}
+						this.followFlagList[i] = '1'
 					}
 					console.info(this.iconList)
 				}
@@ -89,21 +89,30 @@
 					this.$toast('获取初始化信息失败！')
 				}
 			},
-			// // todo
-			// async changeFollow(){
-			// 	try{
-			// 		let res = await axios.post('http://localhost:8020/douyin_user/follow/authorFollow',{
-			// 			"userId": this.userId, 
-			// 			"authorId": this.authorIdList[this.mediaindex],
-			// 			"isFollow": this.isFollow,
-			// 		})
-			// 		console.info("changeFollow:",res);
-			// 	}
-			// 	catch(err){
-			// 		console.error(err);
-			// 	}
-			// 	this.getInitFollow();
-			// },
+			// todo
+			async handleFollow(index){
+				try{
+					let res = await axios.post('http://localhost:8020/douyin_user/follow/authorFollow',{
+						"userId": this.userId, 
+						"authorId": this.userIdList[index],
+						"isFollow": this.followFlagList[index],
+					})
+					if(res.data.code == "200"){
+						if(this.followFlagList[index]=='1'){
+							this.followFlagList[index] = '0'
+							this.flag = '1'
+						}
+						else if(this.followFlagList[index]=='0'){
+							this.followFlagList[index] = '1'
+							this.flag = '0'
+						}
+					}
+				}
+				catch(err){
+					console.error(err);
+				}
+			},
+
 		}
 	}
 </script>
