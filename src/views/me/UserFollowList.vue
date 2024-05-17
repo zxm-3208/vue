@@ -8,8 +8,8 @@
 				<!-- 消息列表 -->
 				<div class="msg-list-box">
 					<div class="msg-list" v-for="(item,index) in userIdList" :key="index">
-						<img :src="iconList[index]" alt="">
-						<div class="user-des" @click="gotoUserHomePage(userIdList[index])">
+						<img :src="iconList[index]" alt="" @click="gotoUserHomePage(userIdList[index])">
+						<div class="user-des">
 							<div class="top">
 								<span>{{nameList[index]}}</span>
 								<span v-if="flag" ></span>
@@ -53,6 +53,7 @@
 		},
 		created(){
 			this.initFollow();
+			this.initFollowFlag();
 		},
 		methods:{
 			toBack(){
@@ -60,28 +61,47 @@
 			},	
 			async initFollow(){
 				this.userId = this.$route.query.userId;
-				this.lastId = Date.parse(new Date());
-				let res = await axios.post('http://localhost:8020/douyin_user/followList/getFollowList',{
-					"userId": this.userId,
-					"lastId": this.lastId,
-					"offset": this.offset,
-				},
-				{
-					headers: {
-						'Authorization': 'Bearer ' + localStorage.getItem('authorization')
-					}
-				})
+				let res = ''
+				if(this.userId == localStorage.getItem('userId')){
+					this.lastId = Date.parse(new Date());
+					res = await axios.post('http://localhost:8020/douyin_user/followList/getFollowList',{
+						"userId": this.userId,
+						"lastId": this.lastId,
+						"offset": this.offset,
+					},
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+				}else{
+					this.lastId = Date.parse(new Date());
+					res = await axios.post('http://localhost:8020/douyin_user/followList/getOtherUserFollowList',{
+						"userId": this.userId,
+						"lastId": this.lastId,
+						"offset": this.offset,
+						'realUserId': localStorage.getItem('userId'),
+					},
+					{
+						headers: {
+							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
+						}
+					})
+				}
 				console.info("followList:",res);
 				if(res.data.code=="200"){
 					this.userIdList = res.data.data.userIdList
 					this.iconList = res.data.data.iconList
 					this.nameList = res.data.data.nameList
 					this.introductionList = res.data.data.introductionList
+					this.followFlagList = res.data.data.followFlagList
 					for(var i = 0; i < this.userIdList.length; i++){
 						if(this.iconList[i]==null || this.iconList[i]==''){
 							this.iconList[i] = 'https://p.qqan.com/up/2018-3/15217745038903395.jpg'
 						}
-						this.followFlagList[i] = '1'
+						if(localStorage.getItem('userId') == this.userIdList[i]){
+							this.followFlagList[i] = '-1';
+						}
 					}
 					console.info(this.iconList)
 				}
@@ -89,10 +109,13 @@
 					this.$toast('获取初始化信息失败！')
 				}
 			},
+			async initFollowFlag(){
+				
+			},
 			async handleFollow(index){
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_user/follow/authorFollow',{
-						"userId": this.userId, 
+						"userId": localStorage.getItem('userId'),
 						"authorId": this.userIdList[index],
 						"isFollow": this.followFlagList[index],
 					})
