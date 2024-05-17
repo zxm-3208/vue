@@ -372,7 +372,7 @@
 			async getInitInf(){	// 获取初始信息
 				try{
 					console.info("userId:", this.mediaindex,this.authorIdList[this.mediaindex] );
-					this.userId = localStorage.getItem('userId');
+					this.userId = this.$route.query.userId;
 					let res = await axios.get('http://localhost:8020/douyin_user/edit/getAttribute?userId='+this.authorIdList[this.mediaindex],
 					{
 						headers: {
@@ -404,7 +404,7 @@
 			async getPublistUrl(){
 				this.lastId = Date.parse(new Date());
 				try{
-					this.userId = localStorage.getItem('userId')
+					this.userId = this.$route.query.userId
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUserLikeUrl',{
 						"userId": this.userId,
 						"lastId": this.lastId,

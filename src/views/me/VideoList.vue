@@ -366,7 +366,7 @@
 			async getInitInf(){	// 获取初始信息
 				try{
 					console.info("userId:", this.mediaindex, this.authorIdList[this.mediaindex])
-					this.userId = localStorage.getItem('userId');
+					this.userId = this.$route.query.userId;
 					let res = await axios.get('http://localhost:8020/douyin_user/edit/getAttribute?userId='+this.authorIdList[this.mediaindex],
 					{
 						headers: {
@@ -398,7 +398,7 @@
 			async getPublistUrl(){
 				this.lastId = Date.parse(new Date());
 				try{
-					this.userId = localStorage.getItem('userId')
+					this.userId = this.$route.query.userId;
 					let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUserUrl',{
 						"userId": this.userId,
 						"lastId": this.lastId,
@@ -410,6 +410,7 @@
 							'Authorization': 'Bearer ' + localStorage.getItem('authorization')
 						}
 					})
+					console.info("res111:",res)
 					if(res.data.code=="200"){
 						this.mediaIdList = res.data.data.mediaId;
 						this.titleList = res.data.data.mediaTitle;

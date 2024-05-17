@@ -9,7 +9,7 @@
 				<div class="msg-list-box">
 					<div class="msg-list" v-for="(item,index) in userIdList" :key="index">
 						<img :src="iconList[index]" alt="">
-						<div class="user-des">
+						<div class="user-des" @click="gotoUserHomePage(userIdList[index])"> 
 							<div class="top">
 								<span>{{nameList[index]}}</span>
 								<span v-if="flag" ></span>
@@ -59,7 +59,7 @@
 				this.$router.push('/me')
 			},	
 			async initFans(){
-				this.userId = localStorage.getItem('userId');
+				this.userId = this.$route.query.userId;
 				this.lastId = Date.parse(new Date());
 				let res = await axios.post('http://localhost:8020/douyin_user/fansList/getFansList',{
 					"userId": this.userId,
@@ -120,7 +120,9 @@
 					console.error(err);
 				}
 			},
-
+			gotoUserHomePage(userId){
+				this.$router.push("/homePage?userId="+userId)
+			}
 		}
 	}
 </script>

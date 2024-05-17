@@ -2,12 +2,6 @@
 	<div class="me">
 		<div class="me-top" :style="bgPic">
 			<div class="menu-box">
-				<button class="exit_icon" @click="loginout">
-					<i class="iconfont icon-logout"></i>
-				</button>
-				<button class="hello" @click="hello">
-					hello
-				</button>
 			</div>
 		</div>
 		<div class="me-warp">
@@ -49,11 +43,6 @@
 						</div>
 					</div>
 					<div class="tab-con" v-show="indexTab==1">
-						<!-- <div class="tab-img">
-							<img class="img" src="../../../public/images/001.jpg" />
-							<img class="img" src="../../../public/images/002.jpg" />
-							<img class="img" src="../../../public/images/003.jpg" />
-						</div> -->
 					</div>
 					<div class="tab-con" v-show="indexTab==2">
 						<div class="tab-img">
@@ -132,27 +121,11 @@
 			toFans(){
 				this.$router.push("/UserFansList?userId="+this.userId)
 			},
-			loginout(){
-				axios.get('http://localhost:8020/douyin_auth/logout', {
-					headers: {
-						'Authorization': 'Bearer ' + localStorage.getItem('authorization')
-					}
-				})
-                .then(
-                    localStorage.removeItem('authorization'),
-					localStorage.removeItem('userId'),
-					this.$router.push('/sign')
-                )
-                .catch(error => {
-                    console.error(error);
-                });
-			},
 			async getPublistImg(){
 				this.lastId = Date.parse(new Date());
 				try{
-					console.info("publistImg:",localStorage.getItem('userId'), this.lastId, this.offset);
 					let res = await axios.post('http://localhost:8020/douyin_publish/showlist/publist',{
-						"userId": localStorage.getItem('userId'),
+						"userId": this.$route.query.userId,
 						"lastId": this.lastId,
 						"offset": this.offset,
 					}
@@ -181,7 +154,7 @@
 				this.LikelastId = Date.parse(new Date());
 				try{
 					let res = await axios.post('http://localhost:8020/douyin_publish/showlist/likeList',{
-						"userId": localStorage.getItem('userId'),
+						"userId": this.$route.query.userId,
 						"lastId": this.LikelastId,
 						"offset": this.Likeoffset,
 						}
@@ -208,7 +181,7 @@
 			async initFollowCount(){
 				this.LikelastId = Date.parse(new Date());
 				try{
-					var userId = localStorage.getItem('userId')
+					var userId = this.$route.query.userId
 					let res = await axios.get('http://localhost:8020/douyin_user/follow/getFollowCount?userId='+userId,
 						{
 							headers: {
@@ -229,7 +202,7 @@
 			async initFansCount(){
 				this.LikelastId = Date.parse(new Date());
 				try{
-					var userId = localStorage.getItem('userId')
+					var userId = this.$route.query.userId
 					let res = await axios.get('http://localhost:8020/douyin_user/follow/getFansCount?userId='+userId,
 						{
 							headers: {
@@ -263,7 +236,7 @@
 			},
 			async getInitInf(){	// 获取初始信息
 				try{
-					this.userId = localStorage.getItem('userId');
+					this.userId = this.$route.query.userId
 					let res = await axios.get('http://localhost:8020/douyin_user/edit/getAttribute?userId='+this.userId,
 					{
 						headers: {
@@ -304,22 +277,6 @@
 			todo(){
 				this.$toast('该功能暂未实现！')
 			},
-			hello(){
-				axios.get('http://localhost:8020/douyin_auth/user/hello', {
-					headers: {
-						'Authorization': 'Bearer ' + localStorage.getItem('authorization')
-					}
-				})
-                .then((res)=>{
-					if(res.data.code=="401"){
-						this.$router.push.push('/sign');
-						localStorage.removeItem('authorization')
-					}
-				})
-                .catch(error => {
-                    console.error(error);
-                });
-			}
 		}
 	}
 </script>

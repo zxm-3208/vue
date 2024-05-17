@@ -55,6 +55,12 @@ const router=new Router({
 					name:'/msg',
 					component:()=> import('./views/msg/Msg.vue')
 				},
+				// 用户粉丝列表
+				{
+					path:'/HomePage',
+					name:'/HomePage',
+					component:()=> import('./views/me/HomePage.vue')
+				},
 			]
 		},
 		// 验证码登录组件
