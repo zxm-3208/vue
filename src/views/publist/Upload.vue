@@ -63,8 +63,11 @@
         undoneFileList: [], // 部分未完成的
         fileProgress: 0, // 上传文件的进度
         mediaId: "",
-        coverUrl: "",
+        outerCoverUrl: "",
+        coverUrl:"",
         userId: "",
+
+        mediaUrl:"",
   
         // 播放页面
         playerOptions: {
@@ -123,11 +126,13 @@
           this.fileProgress = 100;
           const urlres = await previewingVideo(this.fileHash);
           this.mediaId = urlres.data.data.mediaId;
-          this.playerOptions['sources'][0]['src'] = urlres.data.data.url;
+          this.playerOptions['sources'][0]['src'] = urlres.data.data.outerUrl;
+          this.mediaUrl = urlres.data.data.url;
           const coverRes = await previewingCover(urlres.data.data.mediaId);
-          console.info("mediaId:{}",urlres.data.data.mediaId);
-          console.info("coverUrl:",coverRes.data.data);
-          this.coverUrl = coverRes.data.data;
+          console.info("media:{}",urlres);
+          console.info("cover:",coverRes);
+          this.outerCoverUrl = coverRes.data.data.outerUrl;
+          this.coverUrl = coverRes.data.data.url;
           this.nextShow=true;
           return; // 拦截停下
         }
@@ -224,16 +229,20 @@
             console.log("文件并合成功");
             this.loadingShow = false;
             const urlres = await previewingVideo(this.fileHash);
-            this.playerOptions['sources'][0]['src'] = urlres.data.data.url;
+            this.playerOptions['sources'][0]['src'] = urlres.data.data.outerUrl;
+            this.mediaUrl = urlres.data.data.url;
             this.nextShow=true;
             const coverRes = await previewingCover(urlres.data.data.mediaId);
-            this.coverUrl = coverRes.data.data;
+            console.info("media:", urlres);
+            console.info("cover:", coverRes);
+            this.outerCoverUrl = coverRes.data.data.outerUrl;
+            this.coverUrl = coverRes.data.data.url;
           }
         });
       },
       nextStep(){
         console.info(this.mediaId,this.coverUrl);
-        this.$router.push('/Publist?mediaId='+this.mediaId+"&coverURL="+this.coverUrl+"&mediaUrl="+this.playerOptions['sources'][0]['src']);
+        this.$router.push({path: '/Publist', query:{mediaId: this.mediaId, coverURL:this.coverUrl ,mediaUrl:this.mediaUrl , outerCoverUrl:this.outerCoverUrl}});
       },
       // 定义播放或暂停的方法
       playOrStop() {

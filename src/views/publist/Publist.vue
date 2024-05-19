@@ -48,7 +48,8 @@
     data () {
       return {
         textarea: "",
-        icon_url: this.$route.query.coverURL,
+        icon_url: this.$route.query.outerCoverUrl ,
+		innerCoverURL: this.$route.query.coverURL,
 		introduction_text: "",
       }
     },
@@ -60,80 +61,83 @@
           'authorization': localStorage.getItem('authorization') // 从本地获取token就行
         }
       }, 
-      fileArr() {
+       fileArr() {
 			// 上传图片 显示默认图片
 			return this.icon_url ? [{ url: this.icon_url }] : []
 		}
+	},
+	components:{
+		Myheader,
+	},
+	methods:{
+		toBack(){
+				this.$router.push('/Upload')
+			},
+		async getCouver(){
+			const coverRes = await previewingCover(this.$route.query.mediaId);
+			return this.icon_url ? [{ url: coverRes.data.data.outerUrl }] : []
 		},
-		components:{
-			Myheader,
+		//文件上传
+		async handleChange(file) {
+			console.info("======");
+			let mediaId = this.$route.query.mediaId;
+			console.info(mediaId);
+			console.info("======");
+			let formData = new FormData();
+			let spark = new SparkMD5.ArrayBuffer();
+			let fileMd5 = spark.end();
+			formData.append("file", file.file); // 使用FormData可以将blob文件转成二进制binary
+			formData.append("name", file.file.name);
+			formData.append("md5", fileMd5);
+			formData.append("mediaId", mediaId);
+			console.info(file);
+			console.info(file.file);
+			console.info(file.file.name);
+			console.info(fileMd5);
+			console.info(mediaId);
+			const res = await uploadCoverFile(formData);
+			console.info(res);
+			if (res.data.resultCode === 200) {
+			console.log("封面上传成功");
+			}
 		},
-
-		methods:{
-			toBack(){
-					this.$router.push('/Upload')
-				},
-			//文件上传
-			async handleChange(file) {
-				console.info("======");
-				let mediaId = this.$route.query.mediaId;
-				console.info(mediaId);
-				console.info("======");
-				let formData = new FormData();
-				let spark = new SparkMD5.ArrayBuffer();
-				let fileMd5 = spark.end();
-				formData.append("file", file.file); // 使用FormData可以将blob文件转成二进制binary
-				formData.append("name", file.file.name);
-				formData.append("md5", fileMd5);
-				formData.append("mediaId", mediaId);
-				console.info(file);
-				console.info(file.file);
-				console.info(file.file.name);
-				console.info(fileMd5);
-				console.info(mediaId);
-				const res = await uploadCoverFile(formData);
-				console.info(res);
-				if (res.data.resultCode === 200) {
-				console.log("封面上传成功");
-				}
-			},
-			onChange(file, fileList) {
-				// 限制大小在10MB之内
-      			let isLt10M = file.size / 1024 < 500;
-				if(!isLt10M) {
-        			this.$message.error("上传文件大小不能超过 500KB!");
-					if(fileList.length > 1) {
-						this.fileList = [fileList[fileList.length - 1]];
-					}
-      			}
-			},
-			onDraft(){
-				this.$toast('该功能还未实现！')
-			},
-			async onPublish(){
-				this.introduction_text = document.getElementById("textAreaIntroduction").value;
-				try{
-					let res = await axios.post('http://localhost:8020/douyin_publish/publish/editPublist',{
-						"userId": localStorage.getItem('userId'),
-						"title": this.introduction_text,
-						"mediaId": this.$route.query.mediaId,
-						"coverUrl": this.icon_url,
-						"mediaUrl": this.$route.query.mediaUrl,
-					})
-					console.info(res)
-					if(res.data.resultCode=="200"){
-						// 跳转到首页或其他需要登录的页面
-						this.$router.push({ path:"/me"})
-					}
-					else{
-						this.$toast('发布作品出错！')
-
-					}
-				}catch(err){
-					console.error(err);
+		onChange(file, fileList) {
+			// 限制大小在10MB之内
+			let isLt10M = file.size / 1024 < 500;
+			if(!isLt10M) {
+				this.$message.error("上传文件大小不能超过 500KB!");
+				if(fileList.length > 1) {
+					this.fileList = [fileList[fileList.length - 1]];
 				}
 			}
+		},
+		onDraft(){
+			this.$toast('该功能还未实现！')
+		},
+		async onPublish(){
+			this.introduction_text = document.getElementById("textAreaIntroduction").value;
+			try{
+				let res = await axios.post('http://localhost:8020/douyin_publish/publish/editPublist',{
+					"userId": localStorage.getItem('userId'),
+					"title": this.introduction_text,
+					"mediaId": this.$route.query.mediaId,
+					"coverUrl": this.innerCoverURL,
+					"mediaUrl": this.$route.query.mediaUrl,
+				})
+				console.info(res)
+				if(res.data.resultCode=="200"){
+					// 跳转到首页或其他需要登录的页面
+					this.$router.push({ path:"/me"})
+				}
+				else{
+					this.$toast('发布作品出错！')
+
+				}
+			}catch(err){
+				console.error(err);
+			}
 		}
+	}
 	}
 </script>
 <style scoped>
