@@ -160,10 +160,6 @@
 					})
 					console.info("submit:",res);
 					if(res.data.code=="200"){
-						this.icon = res.data.data.icon;
-						if(this.icon!=null){
-							this.iconUrl = this.icon
-						}
 						this.$toast('用户资料编辑成功！')
 					}
 					else{

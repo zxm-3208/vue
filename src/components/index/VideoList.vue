@@ -344,10 +344,12 @@
 						"userId": this.userId, 
 						"mediaId": this.mediaIdList[this.mediaindex]
 					})
+					console.info("like",res)
 				}
 				catch(err){
 					console.error(err);
 				}
+		
 				this.getLikeCount();
 				this.getInitLikeFalg();
 			},

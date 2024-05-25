@@ -439,38 +439,6 @@
 				this.getLikeCount();
 				this.getInitLikeFlag();
 			},
-			// async headleLoadingMedia(){
-			// 	try{
-			// 		let res = await axios.post('http://localhost:8020/douyin_feed/defaultFeed/getUserUrl',{
-			// 			"userId": this.userId,
-			// 			"lastId": this.lastId,
-			// 			"offset": this.offset,
-			// 		}
-			// 		,
-			// 		{
-			// 			headers: {
-			// 				'Authorization': 'Bearer ' + localStorage.getItem('authorization')
-			// 			}
-			// 		})
-			// 		if(res.data.code=="200"){
-			// 			console.info("res:",res)
-			// 			// this.mediaIdList = res.data.data.mediaId;
-			// 			this.lastId = res.data.data.minTime;
-			// 			this.offset = res.data.data.offset;
-			// 			for(var i = 0; i < res.data.data.url.length; i++) {
-			// 				this.dataList.push(res.data.data.url[i]);
-			// 			}
-			// 		}
-			// 		else{
-			// 			this.$toast('获取发布视频数据失败！')
-
-			// 		}
-			// 	}catch(err){
-			// 		console.error(err);
-			// 	}
-			// 	this.getLikeCount();
-			// 	this.getInitLikeFlag();
-			// }
 			
 		}
 		

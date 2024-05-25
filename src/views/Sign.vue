@@ -72,7 +72,6 @@
 
 <script>
     import axios from 'axios';
-
     export default {
         name: 'Sign',
         data() {
@@ -98,14 +97,6 @@
                 catch(err){
 					console.error(err);
 				}
-                // axios.get('http://localhost:8020/douyin_auth/user/code?phone='+this.phone)
-                // .then(
-                //     this.$router.push("/code?phone="+this.phone),
-                // )
-                // .catch(error => {
-                //     console.error(error);
-                // });
-                // this.$router.push("/user/code?"+this.phone) //去密码登陆页面
             },
             show() {
                 this.showMask = true;
